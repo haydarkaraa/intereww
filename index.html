@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intereww - Assessment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --bg-color: #f4f4f4; --form-bg: #ffffff; --text-color: #000000; --border-color: #000000; }
+        body { font-family: 'Courier Prime', monospace; background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; overflow-x: hidden; }
+        .container { background-color: var(--form-bg); border: 3px solid var(--border-color); padding: 40px; max-width: 600px; width: 100%; box-shadow: 10px 10px 0px var(--border-color); transition: all 0.3s ease; }
+        
+        .lang-selector { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .lang-btn { font-family: 'Courier Prime', monospace; background: transparent; border: 1px solid var(--border-color); padding: 5px 10px; cursor: pointer; transition: all 0.2s; }
+        .lang-btn:hover, .lang-btn.active { background: var(--text-color); color: var(--form-bg); }
+
+        .header h1 { font-size: 24px; text-align: center; letter-spacing: 2px; border-bottom: 2px dashed var(--border-color); padding-bottom: 20px; margin-top: 0; margin-bottom: 30px; }
+        .input-group { margin-bottom: 30px; }
+        .input-group label { font-weight: bold; display: block; margin-bottom: 10px; }
+        .input-group input { width: 100%; border: none; border-bottom: 2px solid var(--border-color); font-family: 'Courier Prime', monospace; font-size: 18px; padding: 5px 0; outline: none; }
+        
+        .avatar-section-label { font-weight: bold; margin-bottom: 10px; display: block; }
+        .avatar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 30px; }
+        
+        /* DİCEBEAR İÇİN GÜNCELLENMİŞ AVATAR KUTULARI */
+        .avatar-option { border: 2px solid var(--border-color); padding: 5px; text-align: center; cursor: pointer; filter: grayscale(100%) contrast(200%); transition: all 0.2s; background-color: #fff;}
+        .avatar-option:hover { background-color: #eee; transform: scale(1.05); }
+        .avatar-option.selected { background-color: var(--text-color); border-color: var(--text-color); filter: none; transform: scale(1.1); box-shadow: 4px 4px 0px rgba(0,0,0,0.2); }
+        .avatar-option img { width: 100%; height: auto; display: block; }
+        
+        .start-btn { width: 100%; padding: 15px; font-family: 'Courier Prime', monospace; font-size: 18px; font-weight: bold; background-color: transparent; border: 3px solid var(--border-color); cursor: pointer; margin-top: 15px;}
+        .start-btn:hover { background-color: var(--text-color); color: var(--form-bg); }
+        .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #questionScreen, #gameOverScreen, #leaderboardScreen { display: none; }
+        .status-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border-color); padding-bottom: 15px; margin-bottom: 25px; font-weight: bold; }
+        .lives { display: flex; gap: 5px; font-size: 24px; filter: grayscale(100%) contrast(200%); }
+        .lives span { transition: opacity 0.3s ease; }
+        .lives span.lost { opacity: 0.2; text-decoration: line-through; }
+        .question-text { font-size: 18px; line-height: 1.6; margin-bottom: 30px; }
+        .options-grid { display: flex; flex-direction: column; gap: 15px; }
+        .option-btn { text-align: left; padding: 15px; font-family: 'Courier Prime', monospace; font-size: 15px; background-color: transparent; border: 2px solid var(--border-color); cursor: pointer; transition: all 0.2s ease; line-height: 1.4; }
+        .option-btn:hover { background-color: #eee; transform: translateX(5px); }
+
+        #leaderboardList { list-style: none; padding: 0; margin-bottom: 30px; }
+        #leaderboardList li { padding: 10px 0; border-bottom: 1px dashed var(--border-color); display: flex; justify-content: space-between; font-size: 16px; align-items: center;}
+
+        @keyframes shake { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 80% { transform: translate(2px, -1px) rotate(-1deg); } }
+        .shake-effect { animation: shake 0.4s; animation-iteration-count: 1; border-color: red !important; }
+
+        @media (max-width: 480px) {
+            .avatar-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="entryScreen">
+        <div class="lang-selector">
+            <button class="lang-btn active" onclick="setLang('tr')">TR</button>
+            <button class="lang-btn" onclick="setLang('en')">EN</button>
+            <button class="lang-btn" onclick="setLang('fr')">FR</button>
+            <button class="lang-btn" onclick="setLang('it')">IT</button>
+            <button class="lang-btn" onclick="setLang('es')">ES</button>
+        </div>
+        <div class="header">
+            <h1 id="ui-title">[ BAŞVURU FORMU ]</h1>
+        </div>
+        <div class="input-group">
+            <label id="ui-name-label">Adayın Adı / Soyadı:</label>
+            <input type="text" id="candidateName" placeholder="..." autocomplete="off">
+        </div>
+        
+        <div>
+            <label class="avatar-section-label" id="ui-avatar-label">Avatar:</label>
+            <div class="avatar-grid" id="avatarGrid">
+                </div>
+        </div>
+
+        <button class="start-btn" onclick="mulakataGir()" id="ui-start-btn">[ MÜLAKAT ODASINA GİR ]</button>
+    </div>
+
+    <div class="container" id="questionScreen">
+        <div class="status-bar">
+            <div id="candidateDisplay">Aday: Bekleniyor</div>
+            <div class="lives" id="livesDisplay"></div>
+        </div>
+        <div class="question-text" id="questionText">Soru yükleniyor...</div>
+        <div class="options-grid" id="optionsGrid"></div>
+    </div>
+
+    <div class="container" id="gameOverScreen" style="text-align: center;">
+        <div class="header">
+            <h1 id="ui-gameover-title">[ MÜLAKAT SONLANDIRILDI ]</h1>
+            <p id="ui-gameover-msg">Şirket tarihimizde bu kadar kısa sürede bu kadar yanlış karar veren başka birini görmedik.</p>
+        </div>
+        <h2 style="font-size: 40px; margin: 20px 0;">Skor: <span id="finalScoreDisplay">0</span></h2>
+        <button class="start-btn" onclick="showLeaderboard()" id="ui-btn-leaderboard">[ UTANÇ TABLOSUNU GÖR ]</button>
+    </div>
+
+    <div class="container" id="leaderboardScreen">
+        <div class="header">
+            <h1 id="ui-leaderboard-title">[ UTANÇ TABLOSU ]</h1>
+        </div>
+        <ul id="leaderboardList">
+            <li>Veriler yükleniyor...</li>
+        </ul>
+        <button class="start-btn" onclick="location.reload()" id="ui-btn-restart">[ YENİDEN BAŞVUR ]</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDgsz9A5pAG1-fq6TQ25ezabuxh8TS8JCM",
+            authDomain: "intereww-game.firebaseapp.com",
+            projectId: "intereww-game",
+            storageBucket: "intereww-game.firebasestorage.app",
+            messagingSenderId: "693522429828",
+            appId: "1:693522429828:web:ee354ce4f5c088a54f0fd1",
+            measurementId: "G-J9VELQGHXM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- ARAYÜZ (UI) DİL VERİLERİ ---
+        const gameData = {
+            tr: { ui: { title: "[ BAŞVURU FORMU ]", nameLabel: "Adayın Adı / Soyadı:", avatarLabel: "Avatar:", startBtn: "[ MÜLAKAT ODASINA GİR ]", alertMissing: "İsminizi girmeden ve avatar seçmeden rezil olamazsınız.", candidatePrefix: "Aday: ", questionPrefix: "Soru #", gameOverTitle: "[ MÜLAKAT SONLANDIRILDI ]", gameOverMsg: "Güvenlik çağrılıyor. Lütfen binayı sessizce terk edin.", btnLeaderboard: "[ UTANÇ TABLOSUNU GÖR ]", leaderboardTitle: "[ UTANÇ TABLOSU ]", btnRestart: "[ YENİDEN BAŞVUR ]" } },
+            en: { ui: { title: "[ APPLICATION FORM ]", nameLabel: "Candidate Name:", avatarLabel: "Avatar:", startBtn: "[ ENTER THE ROOM ]", alertMissing: "Name and Avatar required to humiliate yourself.", candidatePrefix: "Candidate: ", questionPrefix: "Question #", gameOverTitle: "[ YOU ARE FIRED ]", gameOverMsg: "Security is on the way. Please leave the building.", btnLeaderboard: "[ VIEW WALL OF SHAME ]", leaderboardTitle: "[ WALL OF SHAME ]", btnRestart: "[ APPLY AGAIN ]" } },
+            fr: { ui: { title: "[ FORMULAIRE DE CANDIDATURE ]", nameLabel: "Nom du candidat:", avatarLabel: "Avatar:", startBtn: "[ ENTRER ]", alertMissing: "Nom et Avatar requis.", candidatePrefix: "Candidat: ", questionPrefix: "Question #", gameOverTitle: "[ VOUS ÊTES VIRÉ ]", gameOverMsg: "La sécurité arrive. Partez.", btnLeaderboard: "[ MUR DE LA HONTE ]", leaderboardTitle: "[ MUR DE LA HONTE ]", btnRestart: "[ RÉAPPLIQUER ]" } },
+            it: { ui: { title: "[ MODULO DI CANDIDATURA ]", nameLabel: "Nome del candidato:", avatarLabel: "Avatar:", startBtn: "[ ENTRA ]", alertMissing: "Nome e Avatar richiesti.", candidatePrefix: "Candidato: ", questionPrefix: "Domanda #", gameOverTitle: "[ SEI LICENZIATO ]", gameOverMsg: "La sicurezza sta arrivando.", btnLeaderboard: "[ MURO DELLA VERGOGNA ]", leaderboardTitle: "[ MURO DELLA VERGOGNA ]", btnRestart: "[ RIPROVA ]" } },
+            es: { ui: { title: "[ FORMULARIO DE SOLICITUD ]", nameLabel: "Nombre del candidato:", avatarLabel: "Avatar:", startBtn: "[ ENTRAR ]", alertMissing: "Nombre y Avatar requeridos.", candidatePrefix: "Candidato: ", questionPrefix: "Pregunta #", gameOverTitle: "[ ESTÁS DESPEDIDO ]", gameOverMsg: "La seguridad está en camino.", btnLeaderboard: "[ MURO DE LA VERGÜENZA ]", leaderboardTitle: "[ MURO DE LA VERGÜENZA ]", btnRestart: "[ VOLVER A APLICAR ]" } }
+        };
+
+        // --- DICEBEAR AVATAR SEED'LERİ ---
+        const avatarSeeds = ["Felix", "Aneka", "Jude", "Aiden", "Chase", "Destiny", "James", "Leah", "Oliver", "Sadie"];
+
+        let currentLang = 'tr';
+        let secilenAvatar = null;
+        let currentPlayer = { isim: "", avatar: "", puan: 0, kravatSayisi: 3 };
+        let currentQuestionIndex = 0;
+        let activeQuestions = [];
+
+        // Yeni Dicebear fonksiyonumuz
+        function renderAvatars() {
+            const grid = document.getElementById('avatarGrid');
+            grid.innerHTML = "";
+            
+            avatarSeeds.forEach(seed => {
+                let div = document.createElement('div');
+                div.className = 'avatar-option';
+                div.setAttribute('data-id', seed);
+                
+                let img = document.createElement('img');
+                img.src = `https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}`;
+                img.alt = seed;
+
+                div.appendChild(img);
+                div.onclick = function() { selectAvatar(this); };
+                grid.appendChild(div);
+            });
+        }
+
+        function setLang(langCode) {
+            currentLang = langCode;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.toLowerCase() === langCode) btn.classList.add('active');
+            });
+            const ui = gameData[currentLang].ui;
+            document.getElementById('ui-title').innerText = ui.title;
+            document.getElementById('ui-name-label').innerText = ui.nameLabel;
+            document.getElementById('ui-avatar-label').innerText = ui.avatarLabel;
+            document.getElementById('ui-start-btn').innerText = ui.startBtn;
+            document.getElementById('ui-gameover-title').innerText = ui.gameOverTitle;
+            document.getElementById('ui-gameover-msg').innerText = ui.gameOverMsg;
+            document.getElementById('ui-btn-leaderboard').innerText = ui.btnLeaderboard;
+            document.getElementById('ui-leaderboard-title').innerText = ui.leaderboardTitle;
+            document.getElementById('ui-btn-restart').innerText = ui.btnRestart;
+        }
+
+        function shuffleArray(array) {
+            let copy = [...array];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function selectAvatar(element) {
+            document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            secilenAvatar = element.getAttribute('data-id');
+        }
+
+        async function mulakataGir() {
+            let isim = document.getElementById('candidateName').value;
+            if (isim.trim() === "" || !secilenAvatar) {
+                alert(gameData[currentLang].ui.alertMissing); return;
+            }
+
+            const startBtn = document.getElementById('ui-start-btn');
+            const originalBtnText = startBtn.innerText;
+            startBtn.innerText = "[ VERİTABANINA BAĞLANILIYOR... ]";
+            startBtn.disabled = true;
+
+            try {
+                const qSnapshot = await getDocs(collection(db, "questions"));
+                let fetchedQuestions = [];
+                
+                qSnapshot.forEach((doc) => {
+                    let data = doc.data();
+                    if(data[currentLang]) {
+                        fetchedQuestions.push(data[currentLang]);
+                    } else if(data['en']) {
+                        fetchedQuestions.push(data['en']); 
+                    } else if(data['tr']) {
+                        fetchedQuestions.push(data['tr']);
+                    }
+                });
+
+                if(fetchedQuestions.length === 0) {
+                    alert("Sistemde hiç soru bulunamadı!");
+                    startBtn.innerText = originalBtnText;
+                    startBtn.disabled = false;
+                    return;
+                }
+
+                activeQuestions = shuffleArray(fetchedQuestions);
+                currentPlayer.isim = isim;
+                currentPlayer.avatar = secilenAvatar;
+
+                document.getElementById('entryScreen').style.display = 'none';
+                document.getElementById('questionScreen').style.display = 'block';
+                document.getElementById('candidateDisplay').innerText = gameData[currentLang].ui.candidatePrefix + currentPlayer.isim;
+                
+                updateLives();
+                loadQuestion();
+
+            } catch (error) {
+                console.error("Sorular backend'den çekilemedi:", error);
+                alert("Sunucuya ulaşılamıyor.");
+                startBtn.innerText = originalBtnText;
+                startBtn.disabled = false;
+            }
+        }
+
+        function updateLives() {
+            const livesDiv = document.getElementById('livesDisplay');
+            livesDiv.innerHTML = ""; 
+            for (let i = 0; i < 3; i++) {
+                let tie = document.createElement('span'); tie.innerText = "👔";
+                if (i >= currentPlayer.kravatSayisi) tie.classList.add('lost');
+                livesDiv.appendChild(tie);
+            }
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= activeQuestions.length) {
+                triggerGameOver(); return;
+            }
+            const q = activeQuestions[currentQuestionIndex];
+            
+            // undefined hatasını önleyen akıllı okuyucu
+            const soruMetni = q.question || q.text; 
+            
+            document.getElementById('questionText').innerText = gameData[currentLang].ui.questionPrefix + (currentQuestionIndex + 1) + ":\n\n" + soruMetni;
+            
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = ""; 
+
+            let shuffledOptions = shuffleArray(q.options);
+            const letters = ["A", "B", "C"];
+            shuffledOptions.forEach((option, index) => {
+                let btn = document.createElement('button');
+                btn.classList.add('option-btn');
+                let cleanText = option.text.replace(/^\[ [A-C] \] /, "");
+                btn.innerText = "[ " + letters[index] + " ] " + cleanText;
+                btn.onclick = () => handleAnswer(option.points);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(points) {
+            currentPlayer.puan += points;
+            if (points === 0) {
+                currentPlayer.kravatSayisi--;
+                updateLives();
+                const questionContainer = document.getElementById('questionScreen');
+                questionContainer.classList.add('shake-effect');
+                setTimeout(() => questionContainer.classList.remove('shake-effect'), 400);
+
+                if (currentPlayer.kravatSayisi <= 0) {
+                    setTimeout(() => triggerGameOver(), 500); return;
+                }
+            }
+            currentQuestionIndex++;
+            setTimeout(() => loadQuestion(), points === 0 ? 600 : 200); 
+        }
+
+        async function triggerGameOver() {
+            document.getElementById('questionScreen').style.display = 'none';
+            document.getElementById('gameOverScreen').style.display = 'block';
+            document.getElementById('finalScoreDisplay').innerText = currentPlayer.puan;
+
+            try {
+                await addDoc(collection(db, "leaderboard"), {
+                    name: currentPlayer.isim,
+                    avatar: currentPlayer.avatar,
+                    score: currentPlayer.puan,
+                    timestamp: serverTimestamp() 
+                });
+            } catch (error) {
+                console.error("Skor kaydedilemedi:", error);
+            }
+        }
+
+        async function showLeaderboard() {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('leaderboardScreen').style.display = 'block';
+            const list = document.getElementById('leaderboardList');
+            
+            try {
+                const q = query(collection(db, "leaderboard"), orderBy("score", "desc"), limit(10));
+                const querySnapshot = await getDocs(q);
+
+                list.innerHTML = ""; 
+                let rank = 1;
+                querySnapshot.forEach((doc) => {
+                    let data = doc.data();
+                    let li = document.createElement('li');
+                    
+                    // Dicebear Avatarını Leaderboard'a Çekiyoruz
+                    let avatarImg = `<img src="https://api.dicebear.com/9.x/adventurer/svg?seed=${data.avatar}" style="width: 35px; height: 35px; border-radius: 50%; vertical-align: middle; margin-right: 10px; background-color: white; border: 1px solid var(--border-color);">`;
+                    
+                    li.innerHTML = `<span style="display:flex; align-items:center;"><b>${rank}.</b> <span style="margin-left: 5px;">${avatarImg}</span> ${data.name}</span> <span><b>${data.score}</b> Puan</span>`;
+                    list.appendChild(li);
+                    rank++;
+                });
+
+                if (querySnapshot.empty) {
+                    list.innerHTML = "<li>Henüz hiç kimse rezil olmadı. İlk sen ol!</li>";
+                }
+            } catch (error) {
+                list.innerHTML = "<li>Sistem hatası. Tabloya ulaşılamıyor.</li>";
+            }
+        }
+
+        window.setLang = setLang;
+        window.selectAvatar = selectAvatar;
+        window.mulakataGir = mulakataGir;
+        window.showLeaderboard = showLeaderboard;
+
+        document.addEventListener('DOMContentLoaded', () => { renderAvatars(); });
+    </script>
+</body>
+</html>
