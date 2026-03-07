@@ -23,7 +23,6 @@
         .avatar-section-label { font-weight: bold; margin-bottom: 10px; display: block; }
         .avatar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 30px; }
         
-        /* DİCEBEAR İÇİN GÜNCELLENMİŞ AVATAR KUTULARI */
         .avatar-option { border: 2px solid var(--border-color); padding: 5px; text-align: center; cursor: pointer; filter: grayscale(100%) contrast(200%); transition: all 0.2s; background-color: #fff;}
         .avatar-option:hover { background-color: #eee; transform: scale(1.05); }
         .avatar-option.selected { background-color: var(--text-color); border-color: var(--text-color); filter: none; transform: scale(1.1); box-shadow: 4px 4px 0px rgba(0,0,0,0.2); }
@@ -96,6 +95,9 @@
             <p id="ui-gameover-msg">Şirket tarihimizde bu kadar kısa sürede bu kadar yanlış karar veren başka birini görmedik.</p>
         </div>
         <h2 style="font-size: 40px; margin: 20px 0;">Skor: <span id="finalScoreDisplay">0</span></h2>
+        
+        <button class="start-btn" onclick="shareScore()" id="ui-btn-share" style="background-color: var(--text-color); color: var(--form-bg); margin-bottom: 15px;">[ REZİLLİĞİMİ PAYLAŞ ]</button>
+        
         <button class="start-btn" onclick="showLeaderboard()" id="ui-btn-leaderboard">[ UTANÇ TABLOSUNU GÖR ]</button>
     </div>
 
@@ -113,6 +115,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // Firebase Ayarları
         const firebaseConfig = {
             apiKey: "AIzaSyDgsz9A5pAG1-fq6TQ25ezabuxh8TS8JCM",
             authDomain: "intereww-game.firebaseapp.com",
@@ -128,11 +131,11 @@
 
         // --- ARAYÜZ (UI) DİL VERİLERİ ---
         const gameData = {
-            tr: { ui: { title: "[ BAŞVURU FORMU ]", nameLabel: "Adayın Adı / Soyadı:", avatarLabel: "Avatar:", startBtn: "[ MÜLAKAT ODASINA GİR ]", alertMissing: "İsminizi girmeden ve avatar seçmeden rezil olamazsınız.", candidatePrefix: "Aday: ", questionPrefix: "Soru #", gameOverTitle: "[ MÜLAKAT SONLANDIRILDI ]", gameOverMsg: "Güvenlik çağrılıyor. Lütfen binayı sessizce terk edin.", btnLeaderboard: "[ UTANÇ TABLOSUNU GÖR ]", leaderboardTitle: "[ UTANÇ TABLOSU ]", btnRestart: "[ YENİDEN BAŞVUR ]" } },
-            en: { ui: { title: "[ APPLICATION FORM ]", nameLabel: "Candidate Name:", avatarLabel: "Avatar:", startBtn: "[ ENTER THE ROOM ]", alertMissing: "Name and Avatar required to humiliate yourself.", candidatePrefix: "Candidate: ", questionPrefix: "Question #", gameOverTitle: "[ YOU ARE FIRED ]", gameOverMsg: "Security is on the way. Please leave the building.", btnLeaderboard: "[ VIEW WALL OF SHAME ]", leaderboardTitle: "[ WALL OF SHAME ]", btnRestart: "[ APPLY AGAIN ]" } },
-            fr: { ui: { title: "[ FORMULAIRE DE CANDIDATURE ]", nameLabel: "Nom du candidat:", avatarLabel: "Avatar:", startBtn: "[ ENTRER ]", alertMissing: "Nom et Avatar requis.", candidatePrefix: "Candidat: ", questionPrefix: "Question #", gameOverTitle: "[ VOUS ÊTES VIRÉ ]", gameOverMsg: "La sécurité arrive. Partez.", btnLeaderboard: "[ MUR DE LA HONTE ]", leaderboardTitle: "[ MUR DE LA HONTE ]", btnRestart: "[ RÉAPPLIQUER ]" } },
-            it: { ui: { title: "[ MODULO DI CANDIDATURA ]", nameLabel: "Nome del candidato:", avatarLabel: "Avatar:", startBtn: "[ ENTRA ]", alertMissing: "Nome e Avatar richiesti.", candidatePrefix: "Candidato: ", questionPrefix: "Domanda #", gameOverTitle: "[ SEI LICENZIATO ]", gameOverMsg: "La sicurezza sta arrivando.", btnLeaderboard: "[ MURO DELLA VERGOGNA ]", leaderboardTitle: "[ MURO DELLA VERGOGNA ]", btnRestart: "[ RIPROVA ]" } },
-            es: { ui: { title: "[ FORMULARIO DE SOLICITUD ]", nameLabel: "Nombre del candidato:", avatarLabel: "Avatar:", startBtn: "[ ENTRAR ]", alertMissing: "Nombre y Avatar requeridos.", candidatePrefix: "Candidato: ", questionPrefix: "Pregunta #", gameOverTitle: "[ ESTÁS DESPEDIDO ]", gameOverMsg: "La seguridad está en camino.", btnLeaderboard: "[ MURO DE LA VERGÜENZA ]", leaderboardTitle: "[ MURO DE LA VERGÜENZA ]", btnRestart: "[ VOLVER A APLICAR ]" } }
+            tr: { ui: { title: "[ BAŞVURU FORMU ]", nameLabel: "Adayın Adı / Soyadı:", avatarLabel: "Avatar:", startBtn: "[ MÜLAKAT ODASINA GİR ]", alertMissing: "İsminizi girmeden ve avatar seçmeden rezil olamazsınız.", candidatePrefix: "Aday: ", questionPrefix: "Soru #", gameOverTitle: "[ MÜLAKAT SONLANDIRILDI ]", gameOverMsg: "Güvenlik çağrılıyor. Lütfen binayı sessizce terk edin.", btnLeaderboard: "[ UTANÇ TABLOSUNU GÖR ]", leaderboardTitle: "[ UTANÇ TABLOSU ]", btnRestart: "[ YENİDEN BAŞVUR ]", btnShare: "[ REZİLLİĞİMİ PAYLAŞ ]", shareText: "Intereww mülakatında {score} puan toplayıp şirketten rezilce kovuldum! Sıkıyorsa sen de dayan:" } },
+            en: { ui: { title: "[ APPLICATION FORM ]", nameLabel: "Candidate Name:", avatarLabel: "Avatar:", startBtn: "[ ENTER THE ROOM ]", alertMissing: "Name and Avatar required to humiliate yourself.", candidatePrefix: "Candidate: ", questionPrefix: "Question #", gameOverTitle: "[ YOU ARE FIRED ]", gameOverMsg: "Security is on the way. Please leave the building.", btnLeaderboard: "[ VIEW WALL OF SHAME ]", leaderboardTitle: "[ WALL OF SHAME ]", btnRestart: "[ APPLY AGAIN ]", btnShare: "[ SHARE MY SHAME ]", shareText: "I was escorted out by security with {score} points in the Intereww interview! Try to beat my fiasco:" } },
+            fr: { ui: { title: "[ FORMULAIRE DE CANDIDATURE ]", nameLabel: "Nom du candidat:", avatarLabel: "Avatar:", startBtn: "[ ENTRER ]", alertMissing: "Nom et Avatar requis.", candidatePrefix: "Candidat: ", questionPrefix: "Question #", gameOverTitle: "[ VOUS ÊTES VIRÉ ]", gameOverMsg: "La sécurité arrive. Partez.", btnLeaderboard: "[ MUR DE LA HONTE ]", leaderboardTitle: "[ MUR DE LA HONTE ]", btnRestart: "[ RÉAPPLIQUER ]", btnShare: "[ PARTAGER MA HONTE ]", shareText: "J'ai été escorté par la sécurité avec {score} points lors de l'entretien Intereww ! Essaie de battre mon fiasco :" } },
+            it: { ui: { title: "[ MODULO DI CANDIDATURA ]", nameLabel: "Nome del candidato:", avatarLabel: "Avatar:", startBtn: "[ ENTRA ]", alertMissing: "Nome e Avatar richiesti.", candidatePrefix: "Candidato: ", questionPrefix: "Domanda #", gameOverTitle: "[ SEI LICENZIATO ]", gameOverMsg: "La sicurezza sta arrivando.", btnLeaderboard: "[ MURO DELLA VERGOGNA ]", leaderboardTitle: "[ MURO DELLA VERGOGNA ]", btnRestart: "[ RIPROVA ]", btnShare: "[ CONDIVIDI LA MIA VERGOGNA ]", shareText: "Sono stato scortato dalla sicurezza con {score} punti al colloquio Intereww! Prova a battere il mio fiasco:" } },
+            es: { ui: { title: "[ FORMULARIO DE SOLICITUD ]", nameLabel: "Nombre del candidato:", avatarLabel: "Avatar:", startBtn: "[ ENTRAR ]", alertMissing: "Nombre y Avatar requeridos.", candidatePrefix: "Candidato: ", questionPrefix: "Pregunta #", gameOverTitle: "[ ESTÁS DESPEDIDO ]", gameOverMsg: "La seguridad está en camino.", btnLeaderboard: "[ MURO DE LA VERGÜENZA ]", leaderboardTitle: "[ MURO DE LA VERGÜENZA ]", btnRestart: "[ VOLVER A APLICAR ]", btnShare: "[ COMPARTIR MI VERGÜENZA ]", shareText: "¡Fui escoltado por la seguridad con {score} puntos en la entrevista de Intereww! Intenta superar mi fiasco:" } }
         };
 
         // --- DICEBEAR AVATAR SEED'LERİ ---
@@ -144,7 +147,6 @@
         let currentQuestionIndex = 0;
         let activeQuestions = [];
 
-        // Yeni Dicebear fonksiyonumuz
         function renderAvatars() {
             const grid = document.getElementById('avatarGrid');
             grid.innerHTML = "";
@@ -180,6 +182,7 @@
             document.getElementById('ui-btn-leaderboard').innerText = ui.btnLeaderboard;
             document.getElementById('ui-leaderboard-title').innerText = ui.leaderboardTitle;
             document.getElementById('ui-btn-restart').innerText = ui.btnRestart;
+            document.getElementById('ui-btn-share').innerText = ui.btnShare; // Paylaş butonu dili
         }
 
         function shuffleArray(array) {
@@ -265,7 +268,7 @@
             }
             const q = activeQuestions[currentQuestionIndex];
             
-            // undefined hatasını önleyen akıllı okuyucu
+            // undefined hatasını çözen akıllı okuyucu
             const soruMetni = q.question || q.text; 
             
             document.getElementById('questionText').innerText = gameData[currentLang].ui.questionPrefix + (currentQuestionIndex + 1) + ":\n\n" + soruMetni;
@@ -350,10 +353,30 @@
             }
         }
 
+        // --- YENİ PAYLAŞIM FONKSİYONU ---
+        function shareScore() {
+            const textToShare = gameData[currentLang].ui.shareText.replace('{score}', currentPlayer.puan);
+            const urlToShare = window.location.href; // Oyunun güncel linkini otomatik alır
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Intereww Game',
+                    text: textToShare,
+                    url: urlToShare
+                }).catch((error) => console.log('Paylaşım iptal edildi', error));
+            } else {
+                // Bilgisayarlar için yedek Twitter (X) paylaşım linki
+                const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(textToShare)}&url=${encodeURIComponent(urlToShare)}`;
+                window.open(twitterUrl, '_blank');
+            }
+        }
+
+        // Window atamaları
         window.setLang = setLang;
         window.selectAvatar = selectAvatar;
         window.mulakataGir = mulakataGir;
         window.showLeaderboard = showLeaderboard;
+        window.shareScore = shareScore;
 
         document.addEventListener('DOMContentLoaded', () => { renderAvatars(); });
     </script>
