@@ -97,7 +97,6 @@
         <h2 style="font-size: 40px; margin: 20px 0;">Skor: <span id="finalScoreDisplay">0</span></h2>
         
         <button class="start-btn" onclick="shareScore()" id="ui-btn-share" style="background-color: var(--text-color); color: var(--form-bg); margin-bottom: 15px;">[ REZİLLİĞİMİ PAYLAŞ ]</button>
-        
         <button class="start-btn" onclick="showLeaderboard()" id="ui-btn-leaderboard">[ UTANÇ TABLOSUNU GÖR ]</button>
     </div>
 
@@ -115,7 +114,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Firebase Ayarları
         const firebaseConfig = {
             apiKey: "AIzaSyDgsz9A5pAG1-fq6TQ25ezabuxh8TS8JCM",
             authDomain: "intereww-game.firebaseapp.com",
@@ -129,7 +127,47 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- ARAYÜZ (UI) DİL VERİLERİ ---
+        // --- 8-BIT RETRO SES MOTORU ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) { audioCtx = new AudioContext(); }
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+        }
+
+        function playTone(freq, type, duration, vol=0.05) {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) { console.log("Ses çalınamadı."); }
+        }
+
+        // Oyun içi özel ses efektleri
+        function playClick() { playTone(600, 'sine', 0.1); } // Basit buton tıklaması
+        function playSelect() { playTone(800, 'square', 0.05, 0.02); } // Şık/Avatar seçimi (Daktilo gibi)
+        function playWrong() { 
+            // Yanlış cevap Buzzer sesi
+            playTone(150, 'sawtooth', 0.3, 0.1); 
+            setTimeout(() => playTone(100, 'sawtooth', 0.4, 0.1), 150); 
+        }
+        function playGameOver() {
+            // Hüzünlü retro bitiş müziği
+            playTone(300, 'triangle', 0.3, 0.1);
+            setTimeout(() => playTone(250, 'triangle', 0.3, 0.1), 300);
+            setTimeout(() => playTone(200, 'triangle', 0.6, 0.1), 600);
+        }
+
+        // --- DİL VERİLERİ ---
         const gameData = {
             tr: { ui: { title: "[ BAŞVURU FORMU ]", nameLabel: "Adayın Adı / Soyadı:", avatarLabel: "Avatar:", startBtn: "[ MÜLAKAT ODASINA GİR ]", alertMissing: "İsminizi girmeden ve avatar seçmeden rezil olamazsınız.", candidatePrefix: "Aday: ", questionPrefix: "Soru #", gameOverTitle: "[ MÜLAKAT SONLANDIRILDI ]", gameOverMsg: "Güvenlik çağrılıyor. Lütfen binayı sessizce terk edin.", btnLeaderboard: "[ UTANÇ TABLOSUNU GÖR ]", leaderboardTitle: "[ UTANÇ TABLOSU ]", btnRestart: "[ YENİDEN BAŞVUR ]", btnShare: "[ REZİLLİĞİMİ PAYLAŞ ]", shareText: "Intereww mülakatında {score} puan toplayıp şirketten rezilce kovuldum! Sıkıyorsa sen de dayan:" } },
             en: { ui: { title: "[ APPLICATION FORM ]", nameLabel: "Candidate Name:", avatarLabel: "Avatar:", startBtn: "[ ENTER THE ROOM ]", alertMissing: "Name and Avatar required to humiliate yourself.", candidatePrefix: "Candidate: ", questionPrefix: "Question #", gameOverTitle: "[ YOU ARE FIRED ]", gameOverMsg: "Security is on the way. Please leave the building.", btnLeaderboard: "[ VIEW WALL OF SHAME ]", leaderboardTitle: "[ WALL OF SHAME ]", btnRestart: "[ APPLY AGAIN ]", btnShare: "[ SHARE MY SHAME ]", shareText: "I was escorted out by security with {score} points in the Intereww interview! Try to beat my fiasco:" } },
@@ -138,7 +176,6 @@
             es: { ui: { title: "[ FORMULARIO DE SOLICITUD ]", nameLabel: "Nombre del candidato:", avatarLabel: "Avatar:", startBtn: "[ ENTRAR ]", alertMissing: "Nombre y Avatar requeridos.", candidatePrefix: "Candidato: ", questionPrefix: "Pregunta #", gameOverTitle: "[ ESTÁS DESPEDIDO ]", gameOverMsg: "La seguridad está en camino.", btnLeaderboard: "[ MURO DE LA VERGÜENZA ]", leaderboardTitle: "[ MURO DE LA VERGÜENZA ]", btnRestart: "[ VOLVER A APLICAR ]", btnShare: "[ COMPARTIR MI VERGÜENZA ]", shareText: "¡Fui escoltado por la seguridad con {score} puntos en la entrevista de Intereww! Intenta superar mi fiasco:" } }
         };
 
-        // --- DICEBEAR AVATAR SEED'LERİ ---
         const avatarSeeds = ["Felix", "Aneka", "Jude", "Aiden", "Chase", "Destiny", "James", "Leah", "Oliver", "Sadie"];
 
         let currentLang = 'tr';
@@ -167,6 +204,7 @@
         }
 
         function setLang(langCode) {
+            playClick(); // Dil seçerken tık sesi
             currentLang = langCode;
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -182,7 +220,7 @@
             document.getElementById('ui-btn-leaderboard').innerText = ui.btnLeaderboard;
             document.getElementById('ui-leaderboard-title').innerText = ui.leaderboardTitle;
             document.getElementById('ui-btn-restart').innerText = ui.btnRestart;
-            document.getElementById('ui-btn-share').innerText = ui.btnShare; // Paylaş butonu dili
+            document.getElementById('ui-btn-share').innerText = ui.btnShare; 
         }
 
         function shuffleArray(array) {
@@ -195,12 +233,14 @@
         }
 
         function selectAvatar(element) {
+            playSelect(); // Avatar seçerken daktilo sesi
             document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('selected'));
             element.classList.add('selected');
             secilenAvatar = element.getAttribute('data-id');
         }
 
         async function mulakataGir() {
+            playClick();
             let isim = document.getElementById('candidateName').value;
             if (isim.trim() === "" || !secilenAvatar) {
                 alert(gameData[currentLang].ui.alertMissing); return;
@@ -267,8 +307,6 @@
                 triggerGameOver(); return;
             }
             const q = activeQuestions[currentQuestionIndex];
-            
-            // undefined hatasını çözen akıllı okuyucu
             const soruMetni = q.question || q.text; 
             
             document.getElementById('questionText').innerText = gameData[currentLang].ui.questionPrefix + (currentQuestionIndex + 1) + ":\n\n" + soruMetni;
@@ -289,8 +327,11 @@
         }
 
         function handleAnswer(points) {
+            playSelect(); // Şık işaretlendiğinde ses
             currentPlayer.puan += points;
+            
             if (points === 0) {
+                playWrong(); // Yanlış cevap verildiğinde acımasız buzzer sesi
                 currentPlayer.kravatSayisi--;
                 updateLives();
                 const questionContainer = document.getElementById('questionScreen');
@@ -306,6 +347,7 @@
         }
 
         async function triggerGameOver() {
+            playGameOver(); // Kovulma müziği çalar
             document.getElementById('questionScreen').style.display = 'none';
             document.getElementById('gameOverScreen').style.display = 'block';
             document.getElementById('finalScoreDisplay').innerText = currentPlayer.puan;
@@ -322,56 +364,47 @@
             }
         }
 
-        async function showLeaderboard() {
+        function showLeaderboard() {
+            playClick();
             document.getElementById('gameOverScreen').style.display = 'none';
             document.getElementById('leaderboardScreen').style.display = 'block';
             const list = document.getElementById('leaderboardList');
             
+            // Veri çekme ve tablo basma...
             try {
                 const q = query(collection(db, "leaderboard"), orderBy("score", "desc"), limit(10));
-                const querySnapshot = await getDocs(q);
-
-                list.innerHTML = ""; 
-                let rank = 1;
-                querySnapshot.forEach((doc) => {
-                    let data = doc.data();
-                    let li = document.createElement('li');
-                    
-                    // Dicebear Avatarını Leaderboard'a Çekiyoruz
-                    let avatarImg = `<img src="https://api.dicebear.com/9.x/adventurer/svg?seed=${data.avatar}" style="width: 35px; height: 35px; border-radius: 50%; vertical-align: middle; margin-right: 10px; background-color: white; border: 1px solid var(--border-color);">`;
-                    
-                    li.innerHTML = `<span style="display:flex; align-items:center;"><b>${rank}.</b> <span style="margin-left: 5px;">${avatarImg}</span> ${data.name}</span> <span><b>${data.score}</b> Puan</span>`;
-                    list.appendChild(li);
-                    rank++;
+                getDocs(q).then(querySnapshot => {
+                    list.innerHTML = ""; 
+                    let rank = 1;
+                    querySnapshot.forEach((doc) => {
+                        let data = doc.data();
+                        let li = document.createElement('li');
+                        let avatarImg = `<img src="https://api.dicebear.com/9.x/adventurer/svg?seed=${data.avatar}" style="width: 35px; height: 35px; border-radius: 50%; vertical-align: middle; margin-right: 10px; background-color: white; border: 1px solid var(--border-color);">`;
+                        li.innerHTML = `<span style="display:flex; align-items:center;"><b>${rank}.</b> <span style="margin-left: 5px;">${avatarImg}</span> ${data.name}</span> <span><b>${data.score}</b> Puan</span>`;
+                        list.appendChild(li);
+                        rank++;
+                    });
+                    if (querySnapshot.empty) list.innerHTML = "<li>Henüz hiç kimse rezil olmadı. İlk sen ol!</li>";
                 });
-
-                if (querySnapshot.empty) {
-                    list.innerHTML = "<li>Henüz hiç kimse rezil olmadı. İlk sen ol!</li>";
-                }
             } catch (error) {
                 list.innerHTML = "<li>Sistem hatası. Tabloya ulaşılamıyor.</li>";
             }
         }
 
-        // --- YENİ PAYLAŞIM FONKSİYONU ---
         function shareScore() {
+            playClick();
             const textToShare = gameData[currentLang].ui.shareText.replace('{score}', currentPlayer.puan);
-            const urlToShare = window.location.href; // Oyunun güncel linkini otomatik alır
+            const urlToShare = window.location.href; 
 
             if (navigator.share) {
-                navigator.share({
-                    title: 'Intereww Game',
-                    text: textToShare,
-                    url: urlToShare
-                }).catch((error) => console.log('Paylaşım iptal edildi', error));
+                navigator.share({ title: 'Intereww Game', text: textToShare, url: urlToShare })
+                .catch((error) => console.log('Paylaşım iptal edildi', error));
             } else {
-                // Bilgisayarlar için yedek Twitter (X) paylaşım linki
                 const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(textToShare)}&url=${encodeURIComponent(urlToShare)}`;
                 window.open(twitterUrl, '_blank');
             }
         }
 
-        // Window atamaları
         window.setLang = setLang;
         window.selectAvatar = selectAvatar;
         window.mulakataGir = mulakataGir;
