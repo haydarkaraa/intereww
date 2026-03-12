@@ -8,16 +8,19 @@
     
     <style>
         :root { --bg-color: #f4f4f4; --form-bg: #ffffff; --text-color: #000000; --border-color: #000000; }
-        body { font-family: 'Courier Prime', monospace; background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; overflow-x: hidden; }
+        body { font-family: 'Courier Prime', monospace; background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; overflow-x: hidden; position: relative;}
         .container { background-color: var(--form-bg); border: 3px solid var(--border-color); padding: 40px; max-width: 600px; width: 100%; box-shadow: 10px 10px 0px var(--border-color); transition: all 0.3s ease; }
         
+        .mute-btn { position: absolute; top: 20px; right: 20px; font-size: 20px; background: var(--form-bg); border: 2px solid var(--border-color); padding: 5px 10px; cursor: pointer; z-index: 1000; transition: all 0.2s;}
+        .mute-btn:hover { background: var(--text-color); color: var(--form-bg); }
+
         .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;}
-        .lang-selector { display: flex; gap: 5px; }
+        .lang-selector { display: flex; gap: 5px; margin: 0 auto;}
         .lang-btn { font-family: 'Courier Prime', monospace; background: transparent; border: 1px solid var(--border-color); padding: 5px 10px; cursor: pointer; transition: all 0.2s; font-size: 12px;}
         .lang-btn:hover, .lang-btn.active { background: var(--text-color); color: var(--form-bg); }
 
-        .mode-selector { display: flex; gap: 10px; width: 100%; }
-        .mode-btn { flex: 1; padding: 10px; font-family: 'Courier Prime', monospace; font-size: 14px; font-weight: bold; background: transparent; border: 2px solid var(--border-color); cursor: pointer; transition: all 0.2s; }
+        .mode-selector { display: flex; gap: 10px; width: 100%; flex-wrap: wrap; justify-content: center;}
+        .mode-btn { flex: 1; padding: 10px; min-width: 140px; font-family: 'Courier Prime', monospace; font-size: 12px; font-weight: bold; background: transparent; border: 2px solid var(--border-color); cursor: pointer; transition: all 0.2s; }
         .mode-btn.active { background: var(--text-color); color: var(--form-bg); transform: scale(1.05); }
 
         .header h1 { font-size: 24px; text-align: center; letter-spacing: 2px; border-bottom: 2px dashed var(--border-color); padding-bottom: 20px; margin-top: 0; margin-bottom: 30px; }
@@ -53,16 +56,19 @@
         @keyframes shake { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 80% { transform: translate(2px, -1px) rotate(-1deg); } }
         .shake-effect { animation: shake 0.4s; animation-iteration-count: 1; border-color: red !important; }
 
-        @media (max-width: 480px) { .avatar-grid { grid-template-columns: repeat(4, 1fr); } .mode-selector { flex-direction: column; } }
+        @media (max-width: 480px) { .avatar-grid { grid-template-columns: repeat(4, 1fr); } }
     </style>
 </head>
 <body>
 
+    <button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+
     <div class="container" id="entryScreen">
         <div class="top-controls">
             <div class="mode-selector">
-                <button class="mode-btn active" id="btn-mode-interview" onclick="setMode('interview')">👔 KURUMSAL MÜLAKAT</button>
-                <button class="mode-btn" id="btn-mode-redflag" onclick="setMode('redflag')">💔 İLK BULUŞMA</button>
+                <button class="mode-btn active" id="btn-mode-interview" onclick="setMode('interview')">👔 MÜLAKAT</button>
+                <button class="mode-btn" id="btn-mode-redflag" onclick="setMode('redflag')">💔 FLÖRT</button>
+                <button class="mode-btn" id="btn-mode-timetravel" onclick="setMode('timetravel')">⏳ ZAMAN YOLCUSU</button>
             </div>
             <div class="lang-selector">
                 <button class="lang-btn active" onclick="setLang('tr')">TR</button>
@@ -135,8 +141,15 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- 8-BIT SES MOTORU ---
+        // --- 8-BIT SES MOTORU (MUTE DESTEKLİ) ---
         let audioCtx;
+        let isMuted = false; // Ses durumu değişkeni
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('muteBtn').innerText = isMuted ? '🔇' : '🔊';
+        }
+
         function initAudio() {
             if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
             if (audioCtx.state === 'suspended') { audioCtx.resume(); }
@@ -145,6 +158,7 @@
         document.addEventListener('touchstart', initAudio, { once: true });
 
         function playTone(freq, type, duration, vol=0.1) {
+            if (isMuted) return; // Mute aktifse sesi çalma
             try {
                 if (!audioCtx) initAudio();
                 const osc = audioCtx.createOscillator();
@@ -171,57 +185,67 @@
 
         const modes = {
             interview: { dbQuestions: "questions", dbLeaderboard: "leaderboard", icon: "👔" },
-            redflag: { dbQuestions: "questions_redflag", dbLeaderboard: "leaderboard_redflag", icon: "💔" }
+            redflag: { dbQuestions: "questions_redflag", dbLeaderboard: "leaderboard_redflag", icon: "💔" },
+            timetravel: { dbQuestions: "questions_timetravel", dbLeaderboard: "leaderboard_timetravel", icon: "⏳" }
         };
 
         const gameData = {
             tr: {
                 interview: { title: "[ BAŞVURU FORMU ]", nameLabel: "Adayın Adı / Soyadı:", avatarLabel: "Avatar:", startBtn: "[ MÜLAKAT ODASINA GİR ]", alertMissing: "İsminizi girmeden rezil olamazsınız.", candidatePrefix: "Aday: ", questionPrefix: "Soru #", gameOverTitle: "[ MÜLAKAT SONLANDIRILDI ]", gameOverMsg: "Güvenlik çağrılıyor. Lütfen binayı terk edin.", btnLeaderboard: "[ UTANÇ TABLOSUNU GÖR ]", leaderboardTitle: "[ UTANÇ TABLOSU ]", btnRestart: "[ YENİDEN BAŞVUR ]", btnShare: "[ REZİLLİĞİMİ PAYLAŞ ]", shareText: "Mülakatta {score} puan toplayıp rezilce kovuldum! Sıkıyorsa sen dayan:" },
-                redflag: { title: "[ İLK BULUŞMA PROFİLİ ]", nameLabel: "Kurbanın Adı / Soyadı:", avatarLabel: "Masken:", startBtn: "[ MASAYA OTUR ]", alertMissing: "İsmini ve maskeni seçmeden felakete koşamazsın.", candidatePrefix: "Flört: ", questionPrefix: "Kriz #", gameOverTitle: "[ HESAP ÖDENDİ, ENGELLENDİN ]", gameOverMsg: "Böyle bir fiyasko romantizm tarihinde görülmedi.", btnLeaderboard: "[ TERK EDİLENLER TABLOSU ]", leaderboardTitle: "[ EN BÜYÜK RED FLAG'LER ]", btnRestart: "[ YENİ BİR KURBAN BUL ]", btnShare: "[ REZİLLİĞİMİ PAYLAŞ ]", shareText: "İlk buluşmada {score} puanlık kriz yaratıp masada terk edildim! Sıkıyorsa sen benden iyisini yap:" }
+                redflag: { title: "[ İLK BULUŞMA PROFİLİ ]", nameLabel: "Kurbanın Adı / Soyadı:", avatarLabel: "Masken:", startBtn: "[ MASAYA OTUR ]", alertMissing: "İsmini ve maskeni seçmeden felakete koşamazsın.", candidatePrefix: "Flört: ", questionPrefix: "Kriz #", gameOverTitle: "[ HESAP ÖDENDİ, ENGELLENDİN ]", gameOverMsg: "Böyle bir fiyasko romantizm tarihinde görülmedi.", btnLeaderboard: "[ TERK EDİLENLER TABLOSU ]", leaderboardTitle: "[ EN BÜYÜK RED FLAG'LER ]", btnRestart: "[ YENİ BİR KURBAN BUL ]", btnShare: "[ REZİLLİĞİMİ PAYLAŞ ]", shareText: "İlk buluşmada {score} puanlık kriz yaratıp masada terk edildim! Sıkıyorsa sen benden iyisini yap:" },
+                timetravel: { title: "[ ZAMAN MAKİNESİ ]", nameLabel: "Yolcunun Adı:", avatarLabel: "Kılık:", startBtn: "[ PORTALI AÇ ]", alertMissing: "İsim ve kılık seçmeden zamanda atlanmaz.", candidatePrefix: "Yolcu: ", questionPrefix: "Olay #", gameOverTitle: "[ PARADOKS YARATTIN ]", gameOverMsg: "Zaman çizgisinden tamamen silindin.", btnLeaderboard: "[ KATİLLER TABLOSU ]", leaderboardTitle: "[ ZAMAN ÇİZELGESİ KATİLLERİ ]", btnRestart: "[ YENİDEN IŞINLAN ]", btnShare: "[ REZİLLİĞİMİ PAYLAŞ ]", shareText: "Zamanda yolculuk yaparken {score} puanlık paradoks yaratıp evrenden silindim! Sıkıyorsa sen dayan:" }
             },
             en: {
                 interview: { title: "[ APPLICATION FORM ]", nameLabel: "Candidate Name:", avatarLabel: "Avatar:", startBtn: "[ ENTER INTERVIEW ]", alertMissing: "Name and Avatar required.", candidatePrefix: "Candidate: ", questionPrefix: "Question #", gameOverTitle: "[ YOU ARE FIRED ]", gameOverMsg: "Security is on the way. Leave.", btnLeaderboard: "[ VIEW SHAME WALL ]", leaderboardTitle: "[ WALL OF SHAME ]", btnRestart: "[ APPLY AGAIN ]", btnShare: "[ SHARE MY SHAME ]", shareText: "I got fired with {score} points in the interview! Try to beat my fiasco:" },
-                redflag: { title: "[ DATING PROFILE ]", nameLabel: "Victim's Name:", avatarLabel: "Your Mask:", startBtn: "[ SIT AT THE TABLE ]", alertMissing: "Name and Mask required.", candidatePrefix: "Date: ", questionPrefix: "Crisis #", gameOverTitle: "[ BLOCKED & GHOSTED ]", gameOverMsg: "History has never seen such a romantic disaster.", btnLeaderboard: "[ WALL OF REJECTS ]", leaderboardTitle: "[ BIGGEST RED FLAGS ]", btnRestart: "[ FIND A NEW VICTIM ]", btnShare: "[ SHARE MY DISASTER ]", shareText: "I created a {score}-point disaster on the first date and got dumped! Beat this:" }
+                redflag: { title: "[ DATING PROFILE ]", nameLabel: "Victim's Name:", avatarLabel: "Your Mask:", startBtn: "[ SIT AT THE TABLE ]", alertMissing: "Name and Mask required.", candidatePrefix: "Date: ", questionPrefix: "Crisis #", gameOverTitle: "[ BLOCKED & GHOSTED ]", gameOverMsg: "History has never seen such a romantic disaster.", btnLeaderboard: "[ WALL OF REJECTS ]", leaderboardTitle: "[ BIGGEST RED FLAGS ]", btnRestart: "[ FIND A NEW VICTIM ]", btnShare: "[ SHARE MY DISASTER ]", shareText: "I created a {score}-point disaster on the first date and got dumped! Beat this:" },
+                timetravel: { title: "[ TIME MACHINE ]", nameLabel: "Traveler Name:", avatarLabel: "Disguise:", startBtn: "[ OPEN PORTAL ]", alertMissing: "Name and disguise required.", candidatePrefix: "Traveler: ", questionPrefix: "Event #", gameOverTitle: "[ PARADOX CREATED ]", gameOverMsg: "You have been erased from the timeline.", btnLeaderboard: "[ WALL OF DESTROYERS ]", leaderboardTitle: "[ TIMELINE DESTROYERS ]", btnRestart: "[ TELEPORT AGAIN ]", btnShare: "[ SHARE MY PARADOX ]", shareText: "I created a {score}-point paradox and got erased from time! Beat this:" }
             },
             fr: {
                 interview: { title: "[ CANDIDATURE ]", nameLabel: "Nom:", avatarLabel: "Avatar:", startBtn: "[ ENTRER ]", alertMissing: "Nom requis.", candidatePrefix: "Candidat: ", questionPrefix: "Question #", gameOverTitle: "[ VOUS ÊTES VIRÉ ]", gameOverMsg: "La sécurité arrive.", btnLeaderboard: "[ MUR DE LA HONTE ]", leaderboardTitle: "[ MUR DE LA HONTE ]", btnRestart: "[ RÉAPPLIQUER ]", btnShare: "[ PARTAGER MA HONTE ]", shareText: "J'ai été viré avec {score} points ! Fais mieux :" },
-                redflag: { title: "[ PROFIL DE RENCONTRE ]", nameLabel: "Nom de la victime:", avatarLabel: "Masque:", startBtn: "[ S'ASSEOIR ]", alertMissing: "Nom requis.", candidatePrefix: "Date: ", questionPrefix: "Crise #", gameOverTitle: "[ BLOQUÉ ET GHOSTED ]", gameOverMsg: "Un désastre romantique total.", btnLeaderboard: "[ MUR DES REJETÉS ]", leaderboardTitle: "[ LES PIRES RED FLAGS ]", btnRestart: "[ NOUVELLE VICTIME ]", btnShare: "[ PARTAGER MON DÉSASTRE ]", shareText: "J'ai créé un désastre de {score} points au premier rencard ! Fais mieux :" }
+                redflag: { title: "[ PROFIL DE RENCONTRE ]", nameLabel: "Nom de la victime:", avatarLabel: "Masque:", startBtn: "[ S'ASSEOIR ]", alertMissing: "Nom requis.", candidatePrefix: "Date: ", questionPrefix: "Crise #", gameOverTitle: "[ BLOQUÉ ET GHOSTÉ ]", gameOverMsg: "Un désastre romantique total.", btnLeaderboard: "[ MUR DES REJETÉS ]", leaderboardTitle: "[ LES PIRES RED FLAGS ]", btnRestart: "[ NOUVELLE VICTIME ]", btnShare: "[ PARTAGER MON DÉSASTRE ]", shareText: "J'ai créé un désastre de {score} points au premier rencard ! Fais mieux :" },
+                timetravel: { title: "[ MACHINE TEMPORELLE ]", nameLabel: "Nom du Voyageur:", avatarLabel: "Déguisement:", startBtn: "[ OUVRIR LE PORTAIL ]", alertMissing: "Nom et déguisement requis.", candidatePrefix: "Voyageur: ", questionPrefix: "Événement #", gameOverTitle: "[ PARADOXE CRÉÉ ]", gameOverMsg: "Vous avez été effacé du temps.", btnLeaderboard: "[ MUR DES DESTRUCTEURS ]", leaderboardTitle: "[ DESTRUCTEURS DE TEMPS ]", btnRestart: "[ RE-TÉLÉPORTER ]", btnShare: "[ PARTAGER MON PARADOXE ]", shareText: "J'ai créé un paradoxe de {score} points et disparu du temps ! Fais mieux :" }
             },
             it: {
                 interview: { title: "[ CANDIDATURA ]", nameLabel: "Nome:", avatarLabel: "Avatar:", startBtn: "[ ENTRA ]", alertMissing: "Nome richiesto.", candidatePrefix: "Candidato: ", questionPrefix: "Domanda #", gameOverTitle: "[ SEI LICENZIATO ]", gameOverMsg: "La sicurezza sta arrivando.", btnLeaderboard: "[ MURO DELLA VERGOGNA ]", leaderboardTitle: "[ MURO DELLA VERGOGNA ]", btnRestart: "[ RIPROVA ]", btnShare: "[ CONDIVIDI LA MIA VERGOGNA ]", shareText: "Sono stato licenziato con {score} punti! Fai di meglio:" },
-                redflag: { title: "[ PROFILO APPUNTAMENTO ]", nameLabel: "Nome della vittima:", avatarLabel: "Maschera:", startBtn: "[ SIEDITI ]", alertMissing: "Nome richiesto.", candidatePrefix: "Date: ", questionPrefix: "Crisi #", gameOverTitle: "[ BLOCCATO E SCARTATO ]", gameOverMsg: "Un disastro romantico totale.", btnLeaderboard: "[ MURO DEI RIFIUTATI ]", leaderboardTitle: "[ I PEGGIORI RED FLAGS ]", btnRestart: "[ NUOVA VITTIMA ]", btnShare: "[ CONDIVIDI IL DISASTRO ]", shareText: "Ho creato un disastro da {score} punti al primo appuntamento! Fai di meglio:" }
+                redflag: { title: "[ PROFILO APPUNTAMENTO ]", nameLabel: "Nome della vittima:", avatarLabel: "Maschera:", startBtn: "[ SIEDITI ]", alertMissing: "Nome richiesto.", candidatePrefix: "Date: ", questionPrefix: "Crisi #", gameOverTitle: "[ BLOCCATO E SCARTATO ]", gameOverMsg: "Un disastro romantico totale.", btnLeaderboard: "[ MURO DEI RIFIUTATI ]", leaderboardTitle: "[ I PEGGIORI RED FLAGS ]", btnRestart: "[ NUOVA VITTIMA ]", btnShare: "[ CONDIVIDI IL DISASTRO ]", shareText: "Ho creato un disastro da {score} punti al primo appuntamento! Fai di meglio:" },
+                timetravel: { title: "[ MACCHINA DEL TEMPO ]", nameLabel: "Nome Viaggiatore:", avatarLabel: "Travestimento:", startBtn: "[ APRI PORTALE ]", alertMissing: "Nome e travestimento richiesti.", candidatePrefix: "Viaggiatore: ", questionPrefix: "Evento #", gameOverTitle: "[ PARADOSSO CREATO ]", gameOverMsg: "Sei stato cancellato dal tempo.", btnLeaderboard: "[ MURO DEI DISTRUTTORI ]", leaderboardTitle: "[ DISTRUTTORI DEL TEMPO ]", btnRestart: "[ TELETRASPORTATI ]", btnShare: "[ CONDIVIDI IL PARADOSSO ]", shareText: "Ho creato un paradosso da {score} punti e sono stato cancellato! Fai di meglio:" }
             },
             es: {
                 interview: { title: "[ SOLICITUD ]", nameLabel: "Nombre:", avatarLabel: "Avatar:", startBtn: "[ ENTRAR ]", alertMissing: "Nombre requerido.", candidatePrefix: "Candidato: ", questionPrefix: "Pregunta #", gameOverTitle: "[ ESTÁS DESPEDIDO ]", gameOverMsg: "La seguridad está en camino.", btnLeaderboard: "[ MURO DE LA VERGÜENZA ]", leaderboardTitle: "[ MURO DE LA VERGÜENZA ]", btnRestart: "[ VOLVER A APLICAR ]", btnShare: "[ COMPARTIR MI VERGÜENZA ]", shareText: "¡Fui despedido con {score} puntos! Intenta superarlo:" },
-                redflag: { title: "[ PERFIL DE CITAS ]", nameLabel: "Nombre de la víctima:", avatarLabel: "Máscara:", startBtn: "[ SENTARSE ]", alertMissing: "Nombre requerido.", candidatePrefix: "Cita: ", questionPrefix: "Crisis #", gameOverTitle: "[ BLOQUEADO Y GHOSTED ]", gameOverMsg: "Un desastre romántico total.", btnLeaderboard: "[ MURO DE RECHAZADOS ]", leaderboardTitle: "[ LAS PEORES RED FLAGS ]", btnRestart: "[ NUEVA VÍCTIMA ]", btnShare: "[ COMPARTIR MI DESASTRE ]", shareText: "¡Creé un desastre de {score} puntos en la primera cita! Intenta superarlo:" }
+                redflag: { title: "[ PERFIL DE CITAS ]", nameLabel: "Nombre de la víctima:", avatarLabel: "Máscara:", startBtn: "[ SENTARSE ]", alertMissing: "Nombre requerido.", candidatePrefix: "Cita: ", questionPrefix: "Crisis #", gameOverTitle: "[ BLOQUEADO Y GHOSTED ]", gameOverMsg: "Un desastre romántico total.", btnLeaderboard: "[ MURO DE RECHAZADOS ]", leaderboardTitle: "[ LAS PEORES RED FLAGS ]", btnRestart: "[ NUEVA VÍCTIMA ]", btnShare: "[ COMPARTIR MI DESASTRE ]", shareText: "¡Creé un desastre de {score} puntos en la primera cita! Intenta superarlo:" },
+                timetravel: { title: "[ MÁQUINA DEL TIEMPO ]", nameLabel: "Nombre del Viajero:", avatarLabel: "Disfraz:", startBtn: "[ ABRIR PORTAL ]", alertMissing: "Nombre y disfraz requeridos.", candidatePrefix: "Viajero: ", questionPrefix: "Evento #", gameOverTitle: "[ PARADOJA CREADA ]", gameOverMsg: "Has sido borrado del tiempo.", btnLeaderboard: "[ MURO DE DESTRUCTORES ]", leaderboardTitle: "[ DESTRUCTORES DEL TIEMPO ]", btnRestart: "[ TELETRANSPORTARSE ]", btnShare: "[ COMPARTIR MI PARADOJA ]", shareText: "¡Creé una paradoja de {score} puntos y fui borrado del tiempo! Intenta superarlo:" }
             }
         };
 
         // --- EVRENLERE ÖZEL AVATAR LİSTELERİ ---
         const interviewAvatars = [
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=Felix",
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=Aneka",
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=Jude",
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=Aiden",
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=Luna",
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=Destiny",
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=James",
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=Leah",
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=Oliver",
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=Sophie"
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=Felix", "https://api.dicebear.com/9.x/adventurer/svg?seed=Aneka",
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=Jude", "https://api.dicebear.com/9.x/adventurer/svg?seed=Aiden",
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=Chase", "https://api.dicebear.com/9.x/adventurer/svg?seed=Destiny",
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=James", "https://api.dicebear.com/9.x/adventurer/svg?seed=Leah",
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=Oliver", "https://api.dicebear.com/9.x/adventurer/svg?seed=Sadie"
         ];
 
         const redflagAvatars = [
-            "https://api.dicebear.com/9.x/miniavs/svg?seed=Milo", 
-            "https://api.dicebear.com/9.x/micah/svg?seed=Luna",
-            "https://api.dicebear.com/9.x/toon-head/svg?seed=Felix",
-            "https://api.dicebear.com/9.x/open-peeps/svg?seed=Aneka",
-            "https://api.dicebear.com/9.x/personas/svg?seed=Sophie",
-            "https://api.dicebear.com/9.x/open-peeps/svg?seed=Luna",
-            "https://api.dicebear.com/9.x/open-peeps/svg?seed=Milo",
-            "https://api.dicebear.com/9.x/open-peeps/svg?seed=Felix",
-            "https://api.dicebear.com/9.x/personas/svg?seed=Aneka",
-            "https://api.dicebear.com/9.x/avataaars/svg?seed=Sophie"
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Dayi&top=noHair&facialHair=moustacheMagnum&mouth=serious", 
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Macho&top=shortHairShortFlat&accessories=sunglasses&facialHair=beardMajestic&mouth=smirk",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Zibidi&top=shortHairShaggyMullet&mouth=sad&eyes=cry",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Weirdo&top=shortHairFrizzle&facialHair=moustacheFancy&mouth=vomit&eyes=surprised",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Keko&top=shortHairTheCaesar&facialHair=beardLight&mouth=grimace&eyes=squint",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Punk&top=longHairShavedSides&hairColor=Pink&clothingColor=Black&mouth=twinkle",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Goth&top=longHairStraight&hairColor=Black&clothingColor=Black&mouth=serious",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Art&top=shortHairShortRound&hairColor=Purple&accessories=round&mouth=tongue",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Snob&top=longHairBob&hairColor=Blonde&accessories=sunglasses&mouth=smirk",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Asi&top=longHairCurvy&hairColor=Blue&mouth=grimace&eyes=wink"
+        ];
+
+        // Yeni "Pixel-Art" Zaman Yolcusu Avatarları
+        const timetravelAvatars = [
+            "https://api.dicebear.com/9.x/pixel-art/svg?seed=Doc", "https://api.dicebear.com/9.x/pixel-art/svg?seed=Marty",
+            "https://api.dicebear.com/9.x/pixel-art/svg?seed=Tardis", "https://api.dicebear.com/9.x/pixel-art/svg?seed=Cyber",
+            "https://api.dicebear.com/9.x/pixel-art/svg?seed=Neo", "https://api.dicebear.com/9.x/pixel-art/svg?seed=Trinity",
+            "https://api.dicebear.com/9.x/pixel-art/svg?seed=Viking", "https://api.dicebear.com/9.x/pixel-art/svg?seed=Pharaoh",
+            "https://api.dicebear.com/9.x/pixel-art/svg?seed=Cowboy", "https://api.dicebear.com/9.x/pixel-art/svg?seed=Einstein"
         ];
 
         let secilenAvatar = null;
@@ -232,9 +256,11 @@
         function renderAvatars() {
             const grid = document.getElementById('avatarGrid');
             grid.innerHTML = "";
-            secilenAvatar = null; // Mod değiştiğinde seçimi temizle
+            secilenAvatar = null; 
             
-            const currentAvatarList = currentMode === 'interview' ? interviewAvatars : redflagAvatars;
+            let currentAvatarList = interviewAvatars;
+            if (currentMode === 'redflag') currentAvatarList = redflagAvatars;
+            if (currentMode === 'timetravel') currentAvatarList = timetravelAvatars;
             
             currentAvatarList.forEach(url => {
                 let div = document.createElement('div');
@@ -280,7 +306,7 @@
             document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`btn-mode-${mode}`).classList.add('active');
             updateUI();
-            renderAvatars(); // Mod değişince resimler güncellenir
+            renderAvatars(); 
         }
 
         function shuffleArray(array) {
@@ -432,7 +458,6 @@
                         let data = doc.data();
                         let li = document.createElement('li');
                         
-                        // Tam link okuyucu (Eski veya yeni sistemi akıllıca ayırt eder)
                         let avatarUrl = data.avatar.includes('http') ? data.avatar : `https://api.dicebear.com/9.x/adventurer/svg?seed=${data.avatar}`;
                         let avatarImg = `<img src="${avatarUrl}" style="width: 35px; height: 35px; border-radius: 50%; vertical-align: middle; margin-right: 10px; background-color: white; border: 1px solid var(--border-color);">`;
                         
@@ -461,12 +486,14 @@
             }
         }
 
+        // Window atamaları
         window.setLang = setLang;
         window.setMode = setMode;
         window.selectAvatar = selectAvatar;
         window.startGame = startGame;
         window.showLeaderboard = showLeaderboard;
         window.shareScore = shareScore;
+        window.toggleMute = toggleMute; // Mute fonksiyonu window'a eklendi
 
         document.addEventListener('DOMContentLoaded', () => { renderAvatars(); updateUI(); });
     </script>
