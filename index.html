@@ -123,6 +123,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // FIREBASE AYARLARI
         const firebaseConfig = {
             apiKey: "AIzaSyDgsz9A5pAG1-fq6TQ25ezabuxh8TS8JCM",
             authDomain: "intereww-game.firebaseapp.com",
@@ -184,7 +185,7 @@
             },
             fr: {
                 interview: { title: "[ CANDIDATURE ]", nameLabel: "Nom:", avatarLabel: "Avatar:", startBtn: "[ ENTRER ]", alertMissing: "Nom requis.", candidatePrefix: "Candidat: ", questionPrefix: "Question #", gameOverTitle: "[ VOUS ÊTES VIRÉ ]", gameOverMsg: "La sécurité arrive.", btnLeaderboard: "[ MUR DE LA HONTE ]", leaderboardTitle: "[ MUR DE LA HONTE ]", btnRestart: "[ RÉAPPLIQUER ]", btnShare: "[ PARTAGER MA HONTE ]", shareText: "J'ai été viré avec {score} points ! Fais mieux :" },
-                redflag: { title: "[ PROFIL DE RENCONTRE ]", nameLabel: "Nom de la victime:", avatarLabel: "Masque:", startBtn: "[ S'ASSEOIR ]", alertMissing: "Nom requis.", candidatePrefix: "Date: ", questionPrefix: "Crise #", gameOverTitle: "[ BLOQUÉ ET GHOSTÉ ]", gameOverMsg: "Un désastre romantique total.", btnLeaderboard: "[ MUR DES REJETÉS ]", leaderboardTitle: "[ LES PIRES RED FLAGS ]", btnRestart: "[ NOUVELLE VICTIME ]", btnShare: "[ PARTAGER MON DÉSASTRE ]", shareText: "J'ai créé un désastre de {score} points au premier rencard ! Fais mieux :" }
+                redflag: { title: "[ PROFIL DE RENCONTRE ]", nameLabel: "Nom de la victime:", avatarLabel: "Masque:", startBtn: "[ S'ASSEOIR ]", alertMissing: "Nom requis.", candidatePrefix: "Date: ", questionPrefix: "Crise #", gameOverTitle: "[ BLOQUÉ ET GHOSTED ]", gameOverMsg: "Un désastre romantique total.", btnLeaderboard: "[ MUR DES REJETÉS ]", leaderboardTitle: "[ LES PIRES RED FLAGS ]", btnRestart: "[ NOUVELLE VICTIME ]", btnShare: "[ PARTAGER MON DÉSASTRE ]", shareText: "J'ai créé un désastre de {score} points au premier rencard ! Fais mieux :" }
             },
             it: {
                 interview: { title: "[ CANDIDATURA ]", nameLabel: "Nome:", avatarLabel: "Avatar:", startBtn: "[ ENTRA ]", alertMissing: "Nome richiesto.", candidatePrefix: "Candidato: ", questionPrefix: "Domanda #", gameOverTitle: "[ SEI LICENZIATO ]", gameOverMsg: "La sicurezza sta arrivando.", btnLeaderboard: "[ MURO DELLA VERGOGNA ]", leaderboardTitle: "[ MURO DELLA VERGOGNA ]", btnRestart: "[ RIPROVA ]", btnShare: "[ CONDIVIDI LA MIA VERGOGNA ]", shareText: "Sono stato licenziato con {score} punti! Fai di meglio:" },
@@ -196,7 +197,33 @@
             }
         };
 
-        const avatarSeeds = ["Felix", "Aneka", "Jude", "Aiden", "Chase", "Destiny", "James", "Leah", "Oliver", "Sadie"];
+        // --- EVRENLERE ÖZEL AVATAR LİSTELERİ ---
+        const interviewAvatars = [
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=Felix",
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=Aneka",
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=Jude",
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=Aiden",
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=Chase",
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=Destiny",
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=James",
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=Leah",
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=Oliver",
+            "https://api.dicebear.com/9.x/adventurer/svg?seed=Sadie"
+        ];
+
+        const redflagAvatars = [
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Dayi&top=noHair&facialHair=moustacheMagnum&mouth=serious", 
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Macho&top=shortHairShortFlat&accessories=sunglasses&facialHair=beardMajestic&mouth=smirk",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Zibidi&top=shortHairShaggyMullet&mouth=sad&eyes=cry",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Weirdo&top=shortHairFrizzle&facialHair=moustacheFancy&mouth=vomit&eyes=surprised",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Keko&top=shortHairTheCaesar&facialHair=beardLight&mouth=grimace&eyes=squint",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Punk&top=longHairShavedSides&hairColor=Pink&clothingColor=Black&mouth=twinkle",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Goth&top=longHairStraight&hairColor=Black&clothingColor=Black&mouth=serious",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Art&top=shortHairShortRound&hairColor=Purple&accessories=round&mouth=tongue",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Snob&top=longHairBob&hairColor=Blonde&accessories=sunglasses&mouth=smirk",
+            "https://api.dicebear.com/9.x/avataaars/svg?seed=Asi&top=longHairCurvy&hairColor=Blue&mouth=grimace&eyes=wink"
+        ];
+
         let secilenAvatar = null;
         let currentPlayer = { isim: "", avatar: "", puan: 0, can: 3 };
         let currentQuestionIndex = 0;
@@ -205,12 +232,18 @@
         function renderAvatars() {
             const grid = document.getElementById('avatarGrid');
             grid.innerHTML = "";
-            avatarSeeds.forEach(seed => {
+            secilenAvatar = null; // Mod değiştiğinde seçimi temizle
+            
+            const currentAvatarList = currentMode === 'interview' ? interviewAvatars : redflagAvatars;
+            
+            currentAvatarList.forEach(url => {
                 let div = document.createElement('div');
                 div.className = 'avatar-option';
-                div.setAttribute('data-id', seed);
+                div.setAttribute('data-id', url); 
+                
                 let img = document.createElement('img');
-                img.src = `https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}`;
+                img.src = url;
+                
                 div.appendChild(img);
                 div.onclick = function() { selectAvatar(this); };
                 grid.appendChild(div);
@@ -247,6 +280,7 @@
             document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`btn-mode-${mode}`).classList.add('active');
             updateUI();
+            renderAvatars(); // Mod değişince resimler güncellenir
         }
 
         function shuffleArray(array) {
@@ -275,7 +309,6 @@
             startBtn.disabled = true;
 
             try {
-                // Seçilen Moda Göre Firebase Tablosunu Çek
                 const dbName = modes[currentMode].dbQuestions;
                 const qSnapshot = await getDocs(collection(db, dbName));
                 let fetchedQuestions = [];
@@ -318,7 +351,7 @@
         function updateLives() {
             const livesDiv = document.getElementById('livesDisplay');
             livesDiv.innerHTML = ""; 
-            const icon = modes[currentMode].icon; // Kravat veya Kalp
+            const icon = modes[currentMode].icon; 
             for (let i = 0; i < 3; i++) {
                 let tie = document.createElement('span'); tie.innerText = icon;
                 if (i >= currentPlayer.can) tie.classList.add('lost');
@@ -373,7 +406,6 @@
             document.getElementById('finalScoreDisplay').innerText = currentPlayer.puan;
 
             try {
-                // Seçilen Moda Göre Skor Tablosuna Kaydet
                 const dbLeaderboard = modes[currentMode].dbLeaderboard;
                 await addDoc(collection(db, dbLeaderboard), {
                     name: currentPlayer.isim,
@@ -399,7 +431,11 @@
                     querySnapshot.forEach((doc) => {
                         let data = doc.data();
                         let li = document.createElement('li');
-                        let avatarImg = `<img src="https://api.dicebear.com/9.x/adventurer/svg?seed=${data.avatar}" style="width: 35px; height: 35px; border-radius: 50%; vertical-align: middle; margin-right: 10px; background-color: white; border: 1px solid var(--border-color);">`;
+                        
+                        // Tam link okuyucu (Eski veya yeni sistemi akıllıca ayırt eder)
+                        let avatarUrl = data.avatar.includes('http') ? data.avatar : `https://api.dicebear.com/9.x/adventurer/svg?seed=${data.avatar}`;
+                        let avatarImg = `<img src="${avatarUrl}" style="width: 35px; height: 35px; border-radius: 50%; vertical-align: middle; margin-right: 10px; background-color: white; border: 1px solid var(--border-color);">`;
+                        
                         li.innerHTML = `<span style="display:flex; align-items:center;"><b>${rank}.</b> <span style="margin-left: 5px;">${avatarImg}</span> ${data.name}</span> <span><b>${data.score}</b> Puan</span>`;
                         list.appendChild(li);
                         rank++;
@@ -425,7 +461,6 @@
             }
         }
 
-        // Window atamaları
         window.setLang = setLang;
         window.setMode = setMode;
         window.selectAvatar = selectAvatar;
