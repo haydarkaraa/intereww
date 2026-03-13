@@ -1,61 +1,80 @@
 // avatars.js - Yerel Avatar Veritabanımız
-// Belirtilen spesifik seçimlere göre güncellenmiş nihai sürüm.
+// Belirttiğin numaralar yeni karakterlerle değiştirildi, diğerleri orijinal halleriyle korundu.
 
 export const avatars = {
-    // 1. Mülakat Modu: (4, 5, 6, 8, 9, 10) numaralı görseller seçildi.
-    // Orijinal Liste: ["Felix", "Aneka", "Jude", "Aiden", "Chase", "Destiny", "James", "Leah", "Oliver", "Sadie"]
-    interview: ["Aiden", "Chase", "Destiny", "Leah", "Oliver", "Sadie"].map(s => `https://api.dicebear.com/9.x/adventurer/svg?seed=${s}`),
+    // 1. Mülakat Modu (4, 5, 6, 8, 9, 10 DEĞİŞTİRİLDİ, diğerleri orijinal)
+    interview: [
+        "Felix",  // 1 (Orijinal)
+        "Aneka",  // 2 (Orijinal)
+        "Jude",   // 3 (Orijinal)
+        "Leo",    // 4 (YENİ)
+        "Mia",    // 5 (YENİ)
+        "Zoe",    // 6 (YENİ)
+        "James",  // 7 (Orijinal)
+        "Max",    // 8 (YENİ)
+        "Sam",    // 9 (YENİ)
+        "Ivy"     // 10 (YENİ)
+    ].map(s => `https://api.dicebear.com/9.x/adventurer/svg?seed=${s}`),
     
-    // 2. Flört Modu: (1, 2, 3, 5, 6, 7, 9) numaralı görseller seçildi.
-    // Orijinal Liste: [Dayi, Macho, Zibidi, Weirdo, Punk, Goth, Art, Snob, Asi, Keko]
+    // 2. Flört Modu (1, 2, 3, 5, 6, 7, 9 DEĞİŞTİRİLDİ, diğerleri orijinal)
     redflag: [
-        "Dayi&top=noHair&facialHair=moustacheMagnum", 
-        "Macho&top=shortHairShortFlat&accessories=sunglasses", 
-        "Zibidi&top=shortHairShaggyMullet&mouth=sad", 
-        "Punk&hairColor=Pink", 
-        "Goth&hairColor=Black", 
-        "Art&hairColor=Purple", 
-        "Asi&hairColor=Blue"
+        "Cringe&top=shortHairDreads01&accessories=kurt",           // 1 (YENİ)
+        "Ghoster&top=eyepatch&mouth=serious",                      // 2 (YENİ)
+        "Toxic&top=shortHairShaggyMullet&hairColor=Red",           // 3 (YENİ)
+        "Weirdo&mouth=vomit",                                      // 4 (Orijinal)
+        "Drama&top=longHairFro&hairColor=PastelPink",              // 5 (YENİ)
+        "Narcissist&top=shortHairTheCaesar&accessories=sunglasses",// 6 (YENİ)
+        "Stalker&top=shortHairFrizzle&eyes=surprised",             // 7 (YENİ)
+        "Snob&accessories=sunglasses",                             // 8 (Orijinal)
+        "Fake&top=longHairStraightStrand&hairColor=Blonde",        // 9 (YENİ)
+        "Keko&mouth=grimace"                                       // 10 (Orijinal)
     ].map(s => `https://api.dicebear.com/9.x/avataaars/svg?seed=${s}`),
     
-    // 3. Zaman Yolcusu Modu: Piksel art dışı bir stil (Avataaars) ile hepsi (10 görsel).
+    // 3. Zaman Yolcusu Modu (Hepsi değiştirildi - Piksel Art yerine Adventurer stili kullanıldı)
     timetravel: [
-        "Tardis", "Cyber", "Neo", "Trinity", "Viking", 
-        "Pharaoh", "Cowboy", "Einstein", "Dayi", "Macho"
-    ].map(s => `https://api.dicebear.com/9.x/avataaars/svg?seed=${s}`),
+        "Arthur", "Cleo", "Leonidas", "Joan", "Tesla", 
+        "Ragnar", "DaVinci", "Marie", "Homer", "Saladin"
+    ].map(s => `https://api.dicebear.com/9.x/adventurer/svg?seed=${s}`),
     
-    // 4. Fenomen Modu: Hepsi "daha aykırı, daha marjinal tiplemeler" (10 görsel).
-    // Ajan 3 numaralı görsel tarzı (gözlüklü, ciddi/alaycı) fenomen için uygun olduğu için o tarzı baz alan uç karakterler tanımlandı.
+    // 4. Fenomen Modu (Hepsi değiştirildi - Ajan 3 tarzında gözlüklü, havalı, aykırı tiplemeler)
     influencer: [
-        // Gözlüklü, ciddi/alaycı ajan tarzını baz alan marjinal karakterler
-        "Marjinal&accessories=sunglasses&clothing=blazerAndShirt&facialHair=beardMajestic&mouth=serious", 
-        "Aykırı&accessories=round&top=shortHairShortRound&hairColor=PastelGreen&mouth=smirk",
-        "Clout&accessories=kurt&top=longHairCurly&hairColor=SilverGray&mouth=smirk",
-        // Uç marjinal tiplemeler
-        "Clown&top=longHairShaggyMullet&mouth=grimace&eyes=surprised&hairColor=PastelPink",
-        "Rebel&hairColor=Red&top=longHairCurly&mouth=serious&eyes=wink",
-        "Punk&hairColor=Pink&clothing=graphicShirt&mouth=twinkle&top=longHairShavedSides",
-        "Goth&hairColor=Black&clothing=graphicShirt&mouth=serious&top=longHairStraight",
-        "Art&hairColor=Purple&accessories=round&mouth=tongue&top=shortHairShortRound",
-        "Keko&top=shortHairTheCaesar&facialHair=beardLight&mouth=grimace&eyes=squint",
-        "Aykırı2&hairColor=PastelPink&top=longHairShavedSides&mouth=serious&eyes=squint"
+        "Inf1&accessories=sunglasses&top=longHairShavedSides&clothing=blazerAndShirt&hairColor=SilverGray",
+        "Inf2&accessories=kurt&top=shortHairDreads02&clothing=blazerAndShirt",
+        "Inf3&accessories=round&top=longHairCurly&clothing=blazerAndShirt&hairColor=Red",
+        "Inf4&accessories=sunglasses&top=shortHairShortFlat&clothing=blazerAndShirt&facialHair=beardMajestic",
+        "Inf5&accessories=wayfarers&top=longHairStraight2&clothing=blazerAndShirt",
+        "Inf6&accessories=sunglasses&top=shortHairSides&clothing=blazerAndShirt&hairColor=PastelPink",
+        "Inf7&accessories=round&top=longHairFro&clothing=blazerAndShirt",
+        "Inf8&accessories=kurt&top=shortHairTheCaesar&clothing=blazerAndShirt&facialHair=moustacheFancy",
+        "Inf9&accessories=sunglasses&top=longHairMiaWallace&clothing=blazerAndShirt&hairColor=Purple",
+        "Inf10&accessories=wayfarers&top=shortHairFrizzle&clothing=blazerAndShirt"
     ].map(s => `https://api.dicebear.com/9.x/avataaars/svg?seed=${s}`),
     
-    // 5. Ajan Modu: (2, 3, 4, 5, 8) numaralı görseller seçildi.
-    // Orijinal Liste: [Bond, Bourne, Hunt, Spy, Secret, Sniper, Intel, Ghost, Shadow, Phantom]
+    // 5. Ajan Modu (2, 3, 4, 5, 8 DEĞİŞTİRİLDİ, diğerleri orijinal)
     agent: [
-        "Bourne", "Hunt", "Spy", "Secret", "Ghost"
+        "Bond",     // 1 (Orijinal)
+        "Rogue",    // 2 (YENİ)
+        "Eagle",    // 3 (YENİ)
+        "Viper",    // 4 (YENİ)
+        "Raven",    // 5 (YENİ)
+        "Sniper",   // 6 (Orijinal)
+        "Intel",    // 7 (Orijinal)
+        "Cobra",    // 8 (YENİ)
+        "Shadow",   // 9 (Orijinal)
+        "Phantom"   // 10 (Orijinal)
     ].map(s => `https://api.dicebear.com/9.x/avataaars/svg?seed=${s}&accessories=sunglasses&clothing=blazerAndShirt`),
     
-    // 6. Aile Yemeği Modu: (1, 2, 3, 5, 6, 7, 9) numaralı görseller seçildi.
-    // Orijinal Liste: [Grandpa, Grandma, Aunt, Uncle, Cousin, Nephew, Niece, Dad, Mom, InLaw]
+    // 6. Aile Yemeği Modu (1, 2, 3, 5, 6, 7, 9 DEĞİŞTİRİLDİ, diğerleri orijinal)
     family: [
-        "Grandpa&top=noHair", 
-        "Grandma&top=longHairBun", 
-        "Aunt&top=longHairCurly", 
-        "Cousin&mouth=smirk", 
-        "Nephew&top=shortHairShortFlat", 
-        "Niece&hairColor=Blonde", 
-        "Mom&top=longHairStraight"
+        "Kaynata&top=noHair&facialHair=moustacheMagnum",           // 1 (YENİ)
+        "Kaynana&top=longHairCurly&hairColor=SilverGray",          // 2 (YENİ)
+        "Yenge&top=longHairStraight&hairColor=Blonde",             // 3 (YENİ)
+        "Uncle&facialHair=moustacheMagnum",                        // 4 (Orijinal)
+        "Gorumce&top=shortHairShortRound&accessories=sunglasses",  // 5 (YENİ)
+        "Eniste&top=shortHairShortFlat&facialHair=beardLight",     // 6 (YENİ)
+        "Bacanak&top=shortHairTheCaesar&mouth=smirk",              // 7 (YENİ)
+        "Dad&facialHair=beardMedium",                              // 8 (Orijinal)
+        "Elti&top=longHairMiaWallace&hairColor=Red",               // 9 (YENİ)
+        "InLaw&eyes=squint"                                        // 10 (Orijinal)
     ].map(s => `https://api.dicebear.com/9.x/avataaars/svg?seed=${s}`)
 };
