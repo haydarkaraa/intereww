@@ -98,13 +98,42 @@ function renderAvatars() {
     grid.innerHTML = "";
     secilenAvatar = null; 
     
-    // avatars objesi artık avatars.js dosyasından geliyor!
-    avatars[currentMode].forEach(url => {
+    // 1. O moda ait sabit tematik avatarları al ve karıştırarak içinden 5 tane seç
+    let thematicAvatars = shuffleArray([...avatars[currentMode]]).slice(0, 5);
+
+    // 2. ORTAK HAVUZ: Her yüklemede tamamen benzersiz, rastgele 5 yeni avatar üret!
+    let dynamicAvatars = [];
+    for (let i = 0; i < 5; i++) {
+        // Rastgele bir kelime (seed) üretiyoruz ki her seferinde yepyeni bir karakter çıksın
+        let randomSeed = Math.random().toString(36).substring(2, 8);
+        // Ortak havuz stili olarak "avataaars" kullanıyoruz
+        dynamicAvatars.push(`https://api.dicebear.com/9.x/avataaars/svg?seed=Havuz_${randomSeed}`);
+    }
+
+    // 3. Tematik ve Ortak Havuz avatarlarını birleştirip tekrar karıştır
+    let combinedAvatars = shuffleArray([...thematicAvatars, ...dynamicAvatars]);
+    
+    combinedAvatars.forEach(url => {
         let div = document.createElement('div');
         div.className = 'avatar-option';
         div.setAttribute('data-id', url); 
+        
         let img = document.createElement('img');
         img.src = url;
+        
+        // 4. YEDEK KLASÖR (FALLBACK) SİSTEMİ: Eğer Dicebear çökerse veya resim yüklenmezse devreye girer
+        img.onerror = function() {
+            // 1 ile 5 arasında rastgele bir sayı seç
+            const randomFallback = Math.floor(Math.random() * 5) + 1;
+            // Kırık linki yerel yedek klasöründeki rastgele bir resimle değiştir
+            this.src = `yedek_avatarlar/yedek${randomFallback}.png`;
+            // Sonsuz döngüye girmemesi için onerror özelliğini kapat
+            this.onerror = null; 
+            
+            // Eğer istersen data-id'yi de yedek resim olarak güncelleyebiliriz
+            div.setAttribute('data-id', this.src);
+        };
+        
         div.appendChild(img);
         div.onclick = function() { selectAvatar(this); };
         grid.appendChild(div);
