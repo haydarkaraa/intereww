@@ -3,61 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kusursuz Fiyasko Motoru</title>
+    <title>Kusursuz Fiyasko Çokluevreni</title>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    
-    <style>
-        :root { --bg-color: #f4f4f4; --form-bg: #ffffff; --text-color: #000000; --border-color: #000000; }
-        body { font-family: 'Courier Prime', monospace; background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; overflow-x: hidden; position: relative;}
-        .container { background-color: var(--form-bg); border: 3px solid var(--border-color); padding: 40px; max-width: 600px; width: 100%; box-shadow: 10px 10px 0px var(--border-color); transition: all 0.3s ease; }
-        
-        .mute-btn { position: absolute; top: 20px; right: 20px; font-size: 20px; background: var(--form-bg); border: 2px solid var(--border-color); padding: 5px 10px; cursor: pointer; z-index: 1000; transition: all 0.2s;}
-        .mute-btn:hover { background: var(--text-color); color: var(--form-bg); }
-
-        .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;}
-        .lang-selector { display: flex; gap: 5px; margin: 0 auto;}
-        .lang-btn { font-family: 'Courier Prime', monospace; background: transparent; border: 1px solid var(--border-color); padding: 5px 10px; cursor: pointer; transition: all 0.2s; font-size: 12px;}
-        .lang-btn:hover, .lang-btn.active { background: var(--text-color); color: var(--form-bg); }
-
-        .mode-selector { display: flex; gap: 10px; width: 100%; flex-wrap: wrap; justify-content: center;}
-        .mode-btn { flex: 1; padding: 10px; min-width: 140px; font-family: 'Courier Prime', monospace; font-size: 12px; font-weight: bold; background: transparent; border: 2px solid var(--border-color); cursor: pointer; transition: all 0.2s; }
-        .mode-btn.active { background: var(--text-color); color: var(--form-bg); transform: scale(1.05); }
-
-        .header h1 { font-size: 24px; text-align: center; letter-spacing: 2px; border-bottom: 2px dashed var(--border-color); padding-bottom: 20px; margin-top: 0; margin-bottom: 30px; }
-        .input-group { margin-bottom: 30px; }
-        .input-group label { font-weight: bold; display: block; margin-bottom: 10px; }
-        .input-group input { width: 100%; border: none; border-bottom: 2px solid var(--border-color); font-family: 'Courier Prime', monospace; font-size: 18px; padding: 5px 0; outline: none; }
-        
-        .avatar-section-label { font-weight: bold; margin-bottom: 10px; display: block; }
-        .avatar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 30px; }
-        
-        .avatar-option { border: 2px solid var(--border-color); padding: 5px; text-align: center; cursor: pointer; filter: grayscale(100%) contrast(200%); transition: all 0.2s; background-color: #fff;}
-        .avatar-option:hover { background-color: #eee; transform: scale(1.05); }
-        .avatar-option.selected { background-color: var(--text-color); border-color: var(--text-color); filter: none; transform: scale(1.1); box-shadow: 4px 4px 0px rgba(0,0,0,0.2); }
-        .avatar-option img { width: 100%; height: auto; display: block; }
-        
-        .start-btn { width: 100%; padding: 15px; font-family: 'Courier Prime', monospace; font-size: 18px; font-weight: bold; background-color: transparent; border: 3px solid var(--border-color); cursor: pointer; margin-top: 15px;}
-        .start-btn:hover { background-color: var(--text-color); color: var(--form-bg); }
-        .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        #questionScreen, #gameOverScreen, #leaderboardScreen { display: none; }
-        .status-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border-color); padding-bottom: 15px; margin-bottom: 25px; font-weight: bold; }
-        .lives { display: flex; gap: 5px; font-size: 24px; filter: grayscale(100%) contrast(200%); }
-        .lives span { transition: opacity 0.3s ease; }
-        .lives span.lost { opacity: 0.2; text-decoration: line-through; }
-        .question-text { font-size: 18px; line-height: 1.6; margin-bottom: 30px; }
-        .options-grid { display: flex; flex-direction: column; gap: 15px; }
-        .option-btn { text-align: left; padding: 15px; font-family: 'Courier Prime', monospace; font-size: 15px; background-color: transparent; border: 2px solid var(--border-color); cursor: pointer; transition: all 0.2s ease; line-height: 1.4; }
-        .option-btn:hover { background-color: #eee; transform: translateX(5px); }
-
-        #leaderboardList { list-style: none; padding: 0; margin-bottom: 30px; }
-        #leaderboardList li { padding: 10px 0; border-bottom: 1px dashed var(--border-color); display: flex; justify-content: space-between; font-size: 16px; align-items: center;}
-
-        @keyframes shake { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 80% { transform: translate(2px, -1px) rotate(-1deg); } }
-        .shake-effect { animation: shake 0.4s; animation-iteration-count: 1; border-color: red !important; }
-
-        @media (max-width: 480px) { .avatar-grid { grid-template-columns: repeat(4, 1fr); } }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -65,11 +13,6 @@
 
     <div class="container" id="entryScreen">
         <div class="top-controls">
-            <div class="mode-selector">
-                <button class="mode-btn active" id="btn-mode-interview" onclick="setMode('interview')">👔 MÜLAKAT</button>
-                <button class="mode-btn" id="btn-mode-redflag" onclick="setMode('redflag')">💔 FLÖRT</button>
-                <button class="mode-btn" id="btn-mode-timetravel" onclick="setMode('timetravel')">⏳ ZAMAN YOLCUSU</button>
-            </div>
             <div class="lang-selector">
                 <button class="lang-btn active" onclick="setLang('tr')">TR</button>
                 <button class="lang-btn" onclick="setLang('en')">EN</button>
@@ -77,22 +20,30 @@
                 <button class="lang-btn" onclick="setLang('it')">IT</button>
                 <button class="lang-btn" onclick="setLang('es')">ES</button>
             </div>
+            <div class="mode-selector">
+                <button class="mode-btn active" id="btn-mode-interview" onclick="setMode('interview')">👔 MÜLAKAT</button>
+                <button class="mode-btn" id="btn-mode-redflag" onclick="setMode('redflag')">💔 FLÖRT</button>
+                <button class="mode-btn" id="btn-mode-timetravel" onclick="setMode('timetravel')">⏳ ZAMAN YOLCUSU</button>
+                <button class="mode-btn" id="btn-mode-influencer" onclick="setMode('influencer')">📱 FENOMEN</button>
+                <button class="mode-btn" id="btn-mode-agent" onclick="setMode('agent')">💣 AJAN</button>
+                <button class="mode-btn" id="btn-mode-family" onclick="setMode('family')">🧿 AİLE YEMEĞİ</button>
+            </div>
         </div>
 
         <div class="header">
             <h1 id="ui-title">[ BAŞVURU FORMU ]</h1>
         </div>
         <div class="input-group">
-            <label id="ui-name-label">Adayın Adı / Soyadı:</label>
+            <label id="ui-name-label">Oyuncunun Adı:</label>
             <input type="text" id="candidateName" placeholder="..." autocomplete="off">
         </div>
         
         <div>
-            <label class="avatar-section-label" id="ui-avatar-label">Avatar:</label>
+            <label class="avatar-section-label" id="ui-avatar-label">Karakterin:</label>
             <div class="avatar-grid" id="avatarGrid"></div>
         </div>
 
-        <button class="start-btn" onclick="startGame()" id="ui-start-btn">[ MÜLAKAT ODASINA GİR ]</button>
+        <button class="start-btn" onclick="startGame()" id="ui-start-btn">[ SİMÜLASYONU BAŞLAT ]</button>
     </div>
 
     <div class="container" id="questionScreen">
@@ -100,13 +51,13 @@
             <div id="candidateDisplay">Bekleniyor</div>
             <div class="lives" id="livesDisplay"></div>
         </div>
-        <div class="question-text" id="questionText">Soru yükleniyor...</div>
+        <div class="question-text" id="questionText">Yükleniyor...</div>
         <div class="options-grid" id="optionsGrid"></div>
     </div>
 
     <div class="container" id="gameOverScreen" style="text-align: center;">
         <div class="header">
-            <h1 id="ui-gameover-title">[ SONUÇ ]</h1>
+            <h1 id="ui-gameover-title">[ OYUN BİTTİ ]</h1>
             <p id="ui-gameover-msg">Mesaj.</p>
         </div>
         <h2 style="font-size: 40px; margin: 20px 0;">Skor: <span id="finalScoreDisplay">0</span></h2>
@@ -117,385 +68,12 @@
 
     <div class="container" id="leaderboardScreen">
         <div class="header">
-            <h1 id="ui-leaderboard-title">[ TABLO ]</h1>
+            <h1 id="ui-leaderboard-title">[ LİDERLİK TABLOSU ]</h1>
         </div>
-        <ul id="leaderboardList">
-            <li>Veriler yükleniyor...</li>
-        </ul>
+        <ul id="leaderboardList"></ul>
         <button class="start-btn" onclick="location.reload()" id="ui-btn-restart">[ YENİDEN DENE ]</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        // FIREBASE AYARLARI
-        const firebaseConfig = {
-            apiKey: "AIzaSyDgsz9A5pAG1-fq6TQ25ezabuxh8TS8JCM",
-            authDomain: "intereww-game.firebaseapp.com",
-            projectId: "intereww-game",
-            storageBucket: "intereww-game.firebasestorage.app",
-            messagingSenderId: "693522429828",
-            appId: "1:693522429828:web:ee354ce4f5c088a54f0fd1"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // --- 8-BIT SES MOTORU (MUTE DESTEKLİ) ---
-        let audioCtx;
-        let isMuted = false; // Ses durumu değişkeni
-
-        function toggleMute() {
-            isMuted = !isMuted;
-            document.getElementById('muteBtn').innerText = isMuted ? '🔇' : '🔊';
-        }
-
-        function initAudio() {
-            if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-        }
-        document.addEventListener('click', initAudio, { once: true });
-        document.addEventListener('touchstart', initAudio, { once: true });
-
-        function playTone(freq, type, duration, vol=0.1) {
-            if (isMuted) return; // Mute aktifse sesi çalma
-            try {
-                if (!audioCtx) initAudio();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(audioCtx.currentTime);
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e) {}
-        }
-
-        function playClick() { playTone(600, 'sine', 0.1, 0.1); } 
-        function playSelect() { playTone(800, 'square', 0.05, 0.05); } 
-        function playWrong() { playTone(150, 'sawtooth', 0.3, 0.15); setTimeout(() => playTone(100, 'sawtooth', 0.4, 0.15), 150); }
-        function playGameOver() { playTone(300, 'triangle', 0.3, 0.15); setTimeout(() => playTone(250, 'triangle', 0.3, 0.15), 300); setTimeout(() => playTone(200, 'triangle', 0.6, 0.15), 600); }
-
-        // --- OYUN MODLARI VE ÇEVİRİLER ---
-        let currentLang = 'tr';
-        let currentMode = 'interview';
-
-        const modes = {
-            interview: { dbQuestions: "questions", dbLeaderboard: "leaderboard", icon: "👔" },
-            redflag: { dbQuestions: "questions_redflag", dbLeaderboard: "leaderboard_redflag", icon: "💔" },
-            timetravel: { dbQuestions: "questions_timetravel", dbLeaderboard: "leaderboard_timetravel", icon: "⏳" }
-        };
-
-        const gameData = {
-            tr: {
-                interview: { title: "[ BAŞVURU FORMU ]", nameLabel: "Adayın Adı / Soyadı:", avatarLabel: "Avatar:", startBtn: "[ MÜLAKAT ODASINA GİR ]", alertMissing: "İsminizi girmeden rezil olamazsınız.", candidatePrefix: "Aday: ", questionPrefix: "Soru #", gameOverTitle: "[ MÜLAKAT SONLANDIRILDI ]", gameOverMsg: "Güvenlik çağrılıyor. Lütfen binayı terk edin.", btnLeaderboard: "[ UTANÇ TABLOSUNU GÖR ]", leaderboardTitle: "[ UTANÇ TABLOSU ]", btnRestart: "[ YENİDEN BAŞVUR ]", btnShare: "[ REZİLLİĞİMİ PAYLAŞ ]", shareText: "Mülakatta {score} puan toplayıp rezilce kovuldum! Sıkıyorsa sen dayan:" },
-                redflag: { title: "[ İLK BULUŞMA PROFİLİ ]", nameLabel: "Kurbanın Adı / Soyadı:", avatarLabel: "Masken:", startBtn: "[ MASAYA OTUR ]", alertMissing: "İsmini ve maskeni seçmeden felakete koşamazsın.", candidatePrefix: "Flört: ", questionPrefix: "Kriz #", gameOverTitle: "[ HESAP ÖDENDİ, ENGELLENDİN ]", gameOverMsg: "Böyle bir fiyasko romantizm tarihinde görülmedi.", btnLeaderboard: "[ TERK EDİLENLER TABLOSU ]", leaderboardTitle: "[ EN BÜYÜK RED FLAG'LER ]", btnRestart: "[ YENİ BİR KURBAN BUL ]", btnShare: "[ REZİLLİĞİMİ PAYLAŞ ]", shareText: "İlk buluşmada {score} puanlık kriz yaratıp masada terk edildim! Sıkıyorsa sen benden iyisini yap:" },
-                timetravel: { title: "[ ZAMAN MAKİNESİ ]", nameLabel: "Yolcunun Adı:", avatarLabel: "Kılık:", startBtn: "[ PORTALI AÇ ]", alertMissing: "İsim ve kılık seçmeden zamanda atlanmaz.", candidatePrefix: "Yolcu: ", questionPrefix: "Olay #", gameOverTitle: "[ PARADOKS YARATTIN ]", gameOverMsg: "Zaman çizgisinden tamamen silindin.", btnLeaderboard: "[ KATİLLER TABLOSU ]", leaderboardTitle: "[ ZAMAN ÇİZELGESİ KATİLLERİ ]", btnRestart: "[ YENİDEN IŞINLAN ]", btnShare: "[ REZİLLİĞİMİ PAYLAŞ ]", shareText: "Zamanda yolculuk yaparken {score} puanlık paradoks yaratıp evrenden silindim! Sıkıyorsa sen dayan:" }
-            },
-            en: {
-                interview: { title: "[ APPLICATION FORM ]", nameLabel: "Candidate Name:", avatarLabel: "Avatar:", startBtn: "[ ENTER INTERVIEW ]", alertMissing: "Name and Avatar required.", candidatePrefix: "Candidate: ", questionPrefix: "Question #", gameOverTitle: "[ YOU ARE FIRED ]", gameOverMsg: "Security is on the way. Leave.", btnLeaderboard: "[ VIEW SHAME WALL ]", leaderboardTitle: "[ WALL OF SHAME ]", btnRestart: "[ APPLY AGAIN ]", btnShare: "[ SHARE MY SHAME ]", shareText: "I got fired with {score} points in the interview! Try to beat my fiasco:" },
-                redflag: { title: "[ DATING PROFILE ]", nameLabel: "Victim's Name:", avatarLabel: "Your Mask:", startBtn: "[ SIT AT THE TABLE ]", alertMissing: "Name and Mask required.", candidatePrefix: "Date: ", questionPrefix: "Crisis #", gameOverTitle: "[ BLOCKED & GHOSTED ]", gameOverMsg: "History has never seen such a romantic disaster.", btnLeaderboard: "[ WALL OF REJECTS ]", leaderboardTitle: "[ BIGGEST RED FLAGS ]", btnRestart: "[ FIND A NEW VICTIM ]", btnShare: "[ SHARE MY DISASTER ]", shareText: "I created a {score}-point disaster on the first date and got dumped! Beat this:" },
-                timetravel: { title: "[ TIME MACHINE ]", nameLabel: "Traveler Name:", avatarLabel: "Disguise:", startBtn: "[ OPEN PORTAL ]", alertMissing: "Name and disguise required.", candidatePrefix: "Traveler: ", questionPrefix: "Event #", gameOverTitle: "[ PARADOX CREATED ]", gameOverMsg: "You have been erased from the timeline.", btnLeaderboard: "[ WALL OF DESTROYERS ]", leaderboardTitle: "[ TIMELINE DESTROYERS ]", btnRestart: "[ TELEPORT AGAIN ]", btnShare: "[ SHARE MY PARADOX ]", shareText: "I created a {score}-point paradox and got erased from time! Beat this:" }
-            },
-            fr: {
-                interview: { title: "[ CANDIDATURE ]", nameLabel: "Nom:", avatarLabel: "Avatar:", startBtn: "[ ENTRER ]", alertMissing: "Nom requis.", candidatePrefix: "Candidat: ", questionPrefix: "Question #", gameOverTitle: "[ VOUS ÊTES VIRÉ ]", gameOverMsg: "La sécurité arrive.", btnLeaderboard: "[ MUR DE LA HONTE ]", leaderboardTitle: "[ MUR DE LA HONTE ]", btnRestart: "[ RÉAPPLIQUER ]", btnShare: "[ PARTAGER MA HONTE ]", shareText: "J'ai été viré avec {score} points ! Fais mieux :" },
-                redflag: { title: "[ PROFIL DE RENCONTRE ]", nameLabel: "Nom de la victime:", avatarLabel: "Masque:", startBtn: "[ S'ASSEOIR ]", alertMissing: "Nom requis.", candidatePrefix: "Date: ", questionPrefix: "Crise #", gameOverTitle: "[ BLOQUÉ ET GHOSTÉ ]", gameOverMsg: "Un désastre romantique total.", btnLeaderboard: "[ MUR DES REJETÉS ]", leaderboardTitle: "[ LES PIRES RED FLAGS ]", btnRestart: "[ NOUVELLE VICTIME ]", btnShare: "[ PARTAGER MON DÉSASTRE ]", shareText: "J'ai créé un désastre de {score} points au premier rencard ! Fais mieux :" },
-                timetravel: { title: "[ MACHINE TEMPORELLE ]", nameLabel: "Nom du Voyageur:", avatarLabel: "Déguisement:", startBtn: "[ OUVRIR LE PORTAIL ]", alertMissing: "Nom et déguisement requis.", candidatePrefix: "Voyageur: ", questionPrefix: "Événement #", gameOverTitle: "[ PARADOXE CRÉÉ ]", gameOverMsg: "Vous avez été effacé du temps.", btnLeaderboard: "[ MUR DES DESTRUCTEURS ]", leaderboardTitle: "[ DESTRUCTEURS DE TEMPS ]", btnRestart: "[ RE-TÉLÉPORTER ]", btnShare: "[ PARTAGER MON PARADOXE ]", shareText: "J'ai créé un paradoxe de {score} points et disparu du temps ! Fais mieux :" }
-            },
-            it: {
-                interview: { title: "[ CANDIDATURA ]", nameLabel: "Nome:", avatarLabel: "Avatar:", startBtn: "[ ENTRA ]", alertMissing: "Nome richiesto.", candidatePrefix: "Candidato: ", questionPrefix: "Domanda #", gameOverTitle: "[ SEI LICENZIATO ]", gameOverMsg: "La sicurezza sta arrivando.", btnLeaderboard: "[ MURO DELLA VERGOGNA ]", leaderboardTitle: "[ MURO DELLA VERGOGNA ]", btnRestart: "[ RIPROVA ]", btnShare: "[ CONDIVIDI LA MIA VERGOGNA ]", shareText: "Sono stato licenziato con {score} punti! Fai di meglio:" },
-                redflag: { title: "[ PROFILO APPUNTAMENTO ]", nameLabel: "Nome della vittima:", avatarLabel: "Maschera:", startBtn: "[ SIEDITI ]", alertMissing: "Nome richiesto.", candidatePrefix: "Date: ", questionPrefix: "Crisi #", gameOverTitle: "[ BLOCCATO E SCARTATO ]", gameOverMsg: "Un disastro romantico totale.", btnLeaderboard: "[ MURO DEI RIFIUTATI ]", leaderboardTitle: "[ I PEGGIORI RED FLAGS ]", btnRestart: "[ NUOVA VITTIMA ]", btnShare: "[ CONDIVIDI IL DISASTRO ]", shareText: "Ho creato un disastro da {score} punti al primo appuntamento! Fai di meglio:" },
-                timetravel: { title: "[ MACCHINA DEL TEMPO ]", nameLabel: "Nome Viaggiatore:", avatarLabel: "Travestimento:", startBtn: "[ APRI PORTALE ]", alertMissing: "Nome e travestimento richiesti.", candidatePrefix: "Viaggiatore: ", questionPrefix: "Evento #", gameOverTitle: "[ PARADOSSO CREATO ]", gameOverMsg: "Sei stato cancellato dal tempo.", btnLeaderboard: "[ MURO DEI DISTRUTTORI ]", leaderboardTitle: "[ DISTRUTTORI DEL TEMPO ]", btnRestart: "[ TELETRASPORTATI ]", btnShare: "[ CONDIVIDI IL PARADOSSO ]", shareText: "Ho creato un paradosso da {score} punti e sono stato cancellato! Fai di meglio:" }
-            },
-            es: {
-                interview: { title: "[ SOLICITUD ]", nameLabel: "Nombre:", avatarLabel: "Avatar:", startBtn: "[ ENTRAR ]", alertMissing: "Nombre requerido.", candidatePrefix: "Candidato: ", questionPrefix: "Pregunta #", gameOverTitle: "[ ESTÁS DESPEDIDO ]", gameOverMsg: "La seguridad está en camino.", btnLeaderboard: "[ MURO DE LA VERGÜENZA ]", leaderboardTitle: "[ MURO DE LA VERGÜENZA ]", btnRestart: "[ VOLVER A APLICAR ]", btnShare: "[ COMPARTIR MI VERGÜENZA ]", shareText: "¡Fui despedido con {score} puntos! Intenta superarlo:" },
-                redflag: { title: "[ PERFIL DE CITAS ]", nameLabel: "Nombre de la víctima:", avatarLabel: "Máscara:", startBtn: "[ SENTARSE ]", alertMissing: "Nombre requerido.", candidatePrefix: "Cita: ", questionPrefix: "Crisis #", gameOverTitle: "[ BLOQUEADO Y GHOSTED ]", gameOverMsg: "Un desastre romántico total.", btnLeaderboard: "[ MURO DE RECHAZADOS ]", leaderboardTitle: "[ LAS PEORES RED FLAGS ]", btnRestart: "[ NUEVA VÍCTIMA ]", btnShare: "[ COMPARTIR MI DESASTRE ]", shareText: "¡Creé un desastre de {score} puntos en la primera cita! Intenta superarlo:" },
-                timetravel: { title: "[ MÁQUINA DEL TIEMPO ]", nameLabel: "Nombre del Viajero:", avatarLabel: "Disfraz:", startBtn: "[ ABRIR PORTAL ]", alertMissing: "Nombre y disfraz requeridos.", candidatePrefix: "Viajero: ", questionPrefix: "Evento #", gameOverTitle: "[ PARADOJA CREADA ]", gameOverMsg: "Has sido borrado del tiempo.", btnLeaderboard: "[ MURO DE DESTRUCTORES ]", leaderboardTitle: "[ DESTRUCTORES DEL TIEMPO ]", btnRestart: "[ TELETRANSPORTARSE ]", btnShare: "[ COMPARTIR MI PARADOJA ]", shareText: "¡Creé una paradoja de {score} puntos y fui borrado del tiempo! Intenta superarlo:" }
-            }
-        };
-
-        // --- EVRENLERE ÖZEL AVATAR LİSTELERİ ---
-        const interviewAvatars = [
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=Felix", "https://api.dicebear.com/9.x/adventurer/svg?seed=Aneka",
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=Jude", "https://api.dicebear.com/9.x/adventurer/svg?seed=Aiden",
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=Chase", "https://api.dicebear.com/9.x/adventurer/svg?seed=Destiny",
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=James", "https://api.dicebear.com/9.x/adventurer/svg?seed=Leah",
-            "https://api.dicebear.com/9.x/adventurer/svg?seed=Oliver", "https://api.dicebear.com/9.x/adventurer/svg?seed=Sadie"
-        ];
-
-        const redflagAvatars = [
-             "https://api.dicebear.com/9.x/miniavs/svg?seed=Milo", 
-            "https://api.dicebear.com/9.x/micah/svg?seed=Luna",
-            "https://api.dicebear.com/9.x/toon-head/svg?seed=Felix",
-            "https://api.dicebear.com/9.x/open-peeps/svg?seed=Aneka",
-            "https://api.dicebear.com/9.x/personas/svg?seed=Sophie",
-            "https://api.dicebear.com/9.x/open-peeps/svg?seed=Luna",
-            "https://api.dicebear.com/9.x/open-peeps/svg?seed=Milo",
-            "https://api.dicebear.com/9.x/open-peeps/svg?seed=Felix",
-            "https://api.dicebear.com/9.x/personas/svg?seed=Aneka",
-            "https://api.dicebear.com/9.x/avataaars/svg?seed=Sophie"
-        ];
-
-        // Yeni "Pixel-Art" Zaman Yolcusu Avatarları
-        const timetravelAvatars = [
-            "https://api.dicebear.com/9.x/pixel-art/svg?seed=Doc", "https://api.dicebear.com/9.x/pixel-art/svg?seed=Marty",
-            "https://api.dicebear.com/9.x/pixel-art/svg?seed=Tardis", "https://api.dicebear.com/9.x/pixel-art/svg?seed=Cyber",
-            "https://api.dicebear.com/9.x/pixel-art/svg?seed=Neo", "https://api.dicebear.com/9.x/pixel-art/svg?seed=Trinity",
-            "https://api.dicebear.com/9.x/pixel-art/svg?seed=Viking", "https://api.dicebear.com/9.x/pixel-art/svg?seed=Pharaoh",
-            "https://api.dicebear.com/9.x/pixel-art/svg?seed=Cowboy", "https://api.dicebear.com/9.x/pixel-art/svg?seed=Einstein"
-        ];
-
-        let secilenAvatar = null;
-        let currentPlayer = { isim: "", avatar: "", puan: 0, can: 3 };
-        let currentQuestionIndex = 0;
-        let activeQuestions = [];
-
-        function renderAvatars() {
-            const grid = document.getElementById('avatarGrid');
-            grid.innerHTML = "";
-            secilenAvatar = null; 
-            
-            let currentAvatarList = interviewAvatars;
-            if (currentMode === 'redflag') currentAvatarList = redflagAvatars;
-            if (currentMode === 'timetravel') currentAvatarList = timetravelAvatars;
-            
-            currentAvatarList.forEach(url => {
-                let div = document.createElement('div');
-                div.className = 'avatar-option';
-                div.setAttribute('data-id', url); 
-                
-                let img = document.createElement('img');
-                img.src = url;
-                
-                div.appendChild(img);
-                div.onclick = function() { selectAvatar(this); };
-                grid.appendChild(div);
-            });
-        }
-
-        function updateUI() {
-            const ui = gameData[currentLang][currentMode];
-            document.getElementById('ui-title').innerText = ui.title;
-            document.getElementById('ui-name-label').innerText = ui.nameLabel;
-            document.getElementById('ui-avatar-label').innerText = ui.avatarLabel;
-            document.getElementById('ui-start-btn').innerText = ui.startBtn;
-            document.getElementById('ui-gameover-title').innerText = ui.gameOverTitle;
-            document.getElementById('ui-gameover-msg').innerText = ui.gameOverMsg;
-            document.getElementById('ui-btn-leaderboard').innerText = ui.btnLeaderboard;
-            document.getElementById('ui-leaderboard-title').innerText = ui.leaderboardTitle;
-            document.getElementById('ui-btn-restart').innerText = ui.btnRestart;
-            document.getElementById('ui-btn-share').innerText = ui.btnShare;
-        }
-
-        function setLang(langCode) {
-            playClick();
-            currentLang = langCode;
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if(btn.innerText.toLowerCase() === langCode) btn.classList.add('active');
-            });
-            updateUI();
-        }
-
-        function setMode(mode) {
-            playClick();
-            currentMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`btn-mode-${mode}`).classList.add('active');
-            updateUI();
-            renderAvatars(); 
-        }
-
-        function shuffleArray(array) {
-            let copy = [...array];
-            for (let i = copy.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [copy[i], copy[j]] = [copy[j], copy[i]];
-            }
-            return copy;
-        }
-
-        function selectAvatar(element) {
-            playSelect();
-            document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('selected'));
-            element.classList.add('selected');
-            secilenAvatar = element.getAttribute('data-id');
-        }
-
-        async function startGame() {
-            playClick();
-            let isim = document.getElementById('candidateName').value;
-            if (isim.trim() === "" || !secilenAvatar) { alert(gameData[currentLang][currentMode].alertMissing); return; }
-
-            const startBtn = document.getElementById('ui-start-btn');
-            startBtn.innerText = "[ BAĞLANILIYOR... ]";
-            startBtn.disabled = true;
-
-            try {
-                const dbName = modes[currentMode].dbQuestions;
-                const qSnapshot = await getDocs(collection(db, dbName));
-                let fetchedQuestions = [];
-                
-                qSnapshot.forEach((doc) => {
-                    let data = doc.data();
-                    if(data[currentLang]) fetchedQuestions.push(data[currentLang]);
-                    else if(data['en']) fetchedQuestions.push(data['en']); 
-                    else if(data['tr']) fetchedQuestions.push(data['tr']);
-                });
-
-                if(fetchedQuestions.length === 0) {
-                    alert("Sistemde hiç soru bulunamadı!");
-                    startBtn.disabled = false;
-                    updateUI();
-                    return;
-                }
-
-                activeQuestions = shuffleArray(fetchedQuestions);
-                currentPlayer.isim = isim;
-                currentPlayer.avatar = secilenAvatar;
-                currentPlayer.puan = 0;
-                currentPlayer.can = 3;
-                currentQuestionIndex = 0;
-
-                document.getElementById('entryScreen').style.display = 'none';
-                document.getElementById('questionScreen').style.display = 'block';
-                document.getElementById('candidateDisplay').innerText = gameData[currentLang][currentMode].candidatePrefix + currentPlayer.isim;
-                
-                updateLives();
-                loadQuestion();
-
-            } catch (error) {
-                alert("Sunucuya ulaşılamıyor.");
-                startBtn.disabled = false;
-                updateUI();
-            }
-        }
-
-        function updateLives() {
-            const livesDiv = document.getElementById('livesDisplay');
-            livesDiv.innerHTML = ""; 
-            const icon = modes[currentMode].icon; 
-            for (let i = 0; i < 3; i++) {
-                let tie = document.createElement('span'); tie.innerText = icon;
-                if (i >= currentPlayer.can) tie.classList.add('lost');
-                livesDiv.appendChild(tie);
-            }
-        }
-
-        function loadQuestion() {
-            if (currentQuestionIndex >= activeQuestions.length) { triggerGameOver(); return; }
-            const q = activeQuestions[currentQuestionIndex];
-            const soruMetni = q.question || q.text; 
-            
-            document.getElementById('questionText').innerText = gameData[currentLang][currentMode].questionPrefix + (currentQuestionIndex + 1) + ":\n\n" + soruMetni;
-            
-            const optionsGrid = document.getElementById('optionsGrid');
-            optionsGrid.innerHTML = ""; 
-
-            let shuffledOptions = shuffleArray(q.options);
-            const letters = ["A", "B", "C"];
-            shuffledOptions.forEach((option, index) => {
-                let btn = document.createElement('button');
-                btn.classList.add('option-btn');
-                let cleanText = option.text.replace(/^\[ [A-C] \] /, "");
-                btn.innerText = "[ " + letters[index] + " ] " + cleanText;
-                btn.onclick = () => handleAnswer(option.points);
-                optionsGrid.appendChild(btn);
-            });
-        }
-
-        function handleAnswer(points) {
-            playSelect();
-            currentPlayer.puan += points;
-            
-            if (points === 0) {
-                playWrong();
-                currentPlayer.can--;
-                updateLives();
-                const questionContainer = document.getElementById('questionScreen');
-                questionContainer.classList.add('shake-effect');
-                setTimeout(() => questionContainer.classList.remove('shake-effect'), 400);
-
-                if (currentPlayer.can <= 0) { setTimeout(() => triggerGameOver(), 500); return; }
-            }
-            currentQuestionIndex++;
-            setTimeout(() => loadQuestion(), points === 0 ? 600 : 200); 
-        }
-
-        async function triggerGameOver() {
-            playGameOver();
-            document.getElementById('questionScreen').style.display = 'none';
-            document.getElementById('gameOverScreen').style.display = 'block';
-            document.getElementById('finalScoreDisplay').innerText = currentPlayer.puan;
-
-            try {
-                const dbLeaderboard = modes[currentMode].dbLeaderboard;
-                await addDoc(collection(db, dbLeaderboard), {
-                    name: currentPlayer.isim,
-                    avatar: currentPlayer.avatar,
-                    score: currentPlayer.puan,
-                    timestamp: serverTimestamp() 
-                });
-            } catch (error) { console.error("Skor kaydedilemedi:", error); }
-        }
-
-        function showLeaderboard() {
-            playClick();
-            document.getElementById('gameOverScreen').style.display = 'none';
-            document.getElementById('leaderboardScreen').style.display = 'block';
-            const list = document.getElementById('leaderboardList');
-            
-            try {
-                const dbLeaderboard = modes[currentMode].dbLeaderboard;
-                const q = query(collection(db, dbLeaderboard), orderBy("score", "desc"), limit(10));
-                getDocs(q).then(querySnapshot => {
-                    list.innerHTML = ""; 
-                    let rank = 1;
-                    querySnapshot.forEach((doc) => {
-                        let data = doc.data();
-                        let li = document.createElement('li');
-                        
-                        let avatarUrl = data.avatar.includes('http') ? data.avatar : `https://api.dicebear.com/9.x/adventurer/svg?seed=${data.avatar}`;
-                        let avatarImg = `<img src="${avatarUrl}" style="width: 35px; height: 35px; border-radius: 50%; vertical-align: middle; margin-right: 10px; background-color: white; border: 1px solid var(--border-color);">`;
-                        
-                        li.innerHTML = `<span style="display:flex; align-items:center;"><b>${rank}.</b> <span style="margin-left: 5px;">${avatarImg}</span> ${data.name}</span> <span><b>${data.score}</b> Puan</span>`;
-                        list.appendChild(li);
-                        rank++;
-                    });
-                    if (querySnapshot.empty) list.innerHTML = "<li>Henüz kimse rezil olmadı. İlk sen ol!</li>";
-                });
-            } catch (error) {
-                list.innerHTML = "<li>Sistem hatası. Tabloya ulaşılamıyor.</li>";
-            }
-        }
-
-        function shareScore() {
-            playClick();
-            const textToShare = gameData[currentLang][currentMode].shareText.replace('{score}', currentPlayer.puan);
-            const urlToShare = window.location.href; 
-
-            if (navigator.share) {
-                navigator.share({ title: 'Kusursuz Fiyasko', text: textToShare, url: urlToShare })
-                .catch((error) => console.log('Paylaşım iptal edildi', error));
-            } else {
-                const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(textToShare)}&url=${encodeURIComponent(urlToShare)}`;
-                window.open(twitterUrl, '_blank');
-            }
-        }
-
-        // Window atamaları
-        window.setLang = setLang;
-        window.setMode = setMode;
-        window.selectAvatar = selectAvatar;
-        window.startGame = startGame;
-        window.showLeaderboard = showLeaderboard;
-        window.shareScore = shareScore;
-        window.toggleMute = toggleMute; // Mute fonksiyonu window'a eklendi
-
-        document.addEventListener('DOMContentLoaded', () => { renderAvatars(); updateUI(); });
-    </script>
+    <script type="module" src="game.js"></script>
 </body>
 </html>
