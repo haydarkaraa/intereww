@@ -1,6 +1,9 @@
+// Gerekli Firebase modüllerini ve yerel avatar dosyamızı içeri aktarıyoruz
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { avatars } from "./avatars.js"; // Yerel API'miz!
 
+// --- FIREBASE AYARLARI ---
 const firebaseConfig = {
     apiKey: "AIzaSyDgsz9A5pAG1-fq6TQ25ezabuxh8TS8JCM",
     authDomain: "intereww-game.firebaseapp.com",
@@ -12,9 +15,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- AUDIO ENGINE ---
+// --- 8-BIT SES MOTORU ---
 let audioCtx;
 let isMuted = false;
+
 window.toggleMute = function() {
     isMuted = !isMuted;
     document.getElementById('muteBtn').innerText = isMuted ? '🔇' : '🔊';
@@ -49,7 +53,7 @@ function playSelect() { playTone(800, 'square', 0.05, 0.05); }
 function playWrong() { playTone(150, 'sawtooth', 0.3, 0.15); setTimeout(() => playTone(100, 'sawtooth', 0.4, 0.15), 150); }
 function playGameOver() { playTone(300, 'triangle', 0.3, 0.15); setTimeout(() => playTone(250, 'triangle', 0.3, 0.15), 300); setTimeout(() => playTone(200, 'triangle', 0.6, 0.15), 600); }
 
-// --- GAME MODES ---
+// --- OYUN MODLARI VE ÇEVİRİLER ---
 let currentLang = 'tr';
 let currentMode = 'interview';
 
@@ -81,16 +85,7 @@ const gameData = {
     },
     fr: { interview: { title: "[ ENTRETIEN ]", nameLabel: "Nom:", avatarLabel: "Avatar:", startBtn: "[ ENTRER ]", candidatePrefix: "Candidat: ", questionPrefix: "Q #", gameOverTitle: "[ VIRÉ ]", gameOverMsg: "Sécurité en route.", btnLeaderboard: "[ MUR DE LA HONTE ]", leaderboardTitle: "[ MUR DE LA HONTE ]", btnRestart: "[ RÉESSAYER ]", btnShare: "[ PARTAGER ]", shareText: "J'ai été viré avec {score} points !" }, redflag: { title: "[ RENCARD ]", nameLabel: "Nom:", avatarLabel: "Masque:", startBtn: "[ S'ASSEOIR ]", candidatePrefix: "Date: ", questionPrefix: "Crise #", gameOverTitle: "[ GHOSTÉ ]", gameOverMsg: "Désastre total.", btnLeaderboard: "[ REJETÉS ]", leaderboardTitle: "[ PIRES RED FLAGS ]", btnRestart: "[ NOUVEAU ]", btnShare: "[ PARTAGER ]", shareText: "J'ai gâché un rencard avec {score} points !" }, timetravel: { title: "[ VOYAGE TEMPOREL ]", nameLabel: "Voyageur:", avatarLabel: "Style:", startBtn: "[ GO ]", candidatePrefix: "Voyageur: ", questionPrefix: "Event #", gameOverTitle: "[ PARADOXE ]", gameOverMsg: "Effacé.", btnLeaderboard: "[ DESTRUCTEURS ]", leaderboardTitle: "[ DESTRUCTEURS ]", btnRestart: "[ RETRY ]", btnShare: "[ SHARE ]", shareText: "Paradoxe : {score} points !" }, influencer: { title: "[ LIVE ]", nameLabel: "Canal:", avatarLabel: "Filtre:", startBtn: "[ GO LIVE ]", candidatePrefix: "Créateur: ", questionPrefix: "Scandale #", gameOverTitle: "[ CANCELLED ]", gameOverMsg: "Fini.", btnLeaderboard: "[ CANCELLED ]", leaderboardTitle: "[ CANCELLED ]", btnRestart: "[ NEW ]", btnShare: "[ SHARE ]", shareText: "Cancelled avec {score} points !" }, agent: { title: "[ SECRET ]", nameLabel: "Code:", avatarLabel: "Agent:", startBtn: "[ GO ]", candidatePrefix: "Agent: ", questionPrefix: "Erreur #", gameOverTitle: "[ ÉCHEC ]", gameOverMsg: "Crise.", btnLeaderboard: "[ EXPOSÉS ]", leaderboardTitle: "[ EXPOSÉS ]", btnRestart: "[ RETRY ]", btnShare: "[ SHARE ]", shareText: "Échec agent : {score} points !" }, family: { title: "[ FAMILLE ]", nameLabel: "Nom:", avatarLabel: "Humeur:", startBtn: "[ MANGER ]", candidatePrefix: "Enfant: ", questionPrefix: "Drame #", gameOverTitle: "[ RENIÉ ]", gameOverMsg: "Sans héritage.", btnLeaderboard: "[ RENIÉS ]", leaderboardTitle: "[ RENIÉS ]", btnRestart: "[ RETRY ]", btnShare: "[ SHARE ]", shareText: "Drame familial : {score} points !" } },
     it: { interview: { title: "[ COLLOQUIO ]", nameLabel: "Nome:", avatarLabel: "Avatar:", startBtn: "[ ENTRA ]", candidatePrefix: "Candidato: ", questionPrefix: "Q #", gameOverTitle: "[ LICENZIATO ]", gameOverMsg: "Sicurezza in arrivo.", btnLeaderboard: "[ VERGOGNA ]", leaderboardTitle: "[ MURO DELLA VERGOGNA ]", btnRestart: "[ RIPROVA ]", btnShare: "[ CONDIVIDI ]", shareText: "Licenziato con {score} punti!" }, redflag: { title: "[ APPUNTAMENTO ]", nameLabel: "Nome:", avatarLabel: "Maschera:", startBtn: "[ SIEDITI ]", candidatePrefix: "Date: ", questionPrefix: "Crisi #", gameOverTitle: "[ SCARTATO ]", gameOverMsg: "Disastro totale.", btnLeaderboard: "[ RIFIUTATI ]", leaderboardTitle: "[ PEGGIORI RED FLAG ]", btnRestart: "[ NUOVO ]", btnShare: "[ CONDIVIDI ]", shareText: "Appuntamento rovinato con {score} punti!" }, timetravel: { title: "[ TEMPO ]", nameLabel: "Viaggiatore:", avatarLabel: "Stile:", startBtn: "[ GO ]", candidatePrefix: "Viaggiatore: ", questionPrefix: "Event #", gameOverTitle: "[ PARADOSSO ]", gameOverMsg: "Cancellato.", btnLeaderboard: "[ DISTRUTTORI ]", leaderboardTitle: "[ DISTRUTTORI ]", btnRestart: "[ RETRY ]", btnShare: "[ SHARE ]", shareText: "Paradosso: {score} punti!" }, influencer: { title: "[ LIVE ]", nameLabel: "Canale:", avatarLabel: "Filtro:", startBtn: "[ GO LIVE ]", candidatePrefix: "Creatore: ", questionPrefix: "Scandalo #", gameOverTitle: "[ CANCELLATO ]", gameOverMsg: "Finito.", btnLeaderboard: "[ CANCELLATI ]", leaderboardTitle: "[ CANCELLATI ]", btnRestart: "[ NEW ]", btnShare: "[ SHARE ]", shareText: "Cancellato con {score} punti!" }, agent: { title: "[ SEGRETO ]", nameLabel: "Codice:", avatarLabel: "Agente:", startBtn: "[ GO ]", candidatePrefix: "Agente: ", questionPrefix: "Errore #", gameOverTitle: "[ FALLITO ]", gameOverMsg: "Crisi.", btnLeaderboard: "[ ESPOSTI ]", leaderboardTitle: "[ ESPOSTI ]", btnRestart: "[ RETRY ]", btnShare: "[ SHARE ]", shareText: "Agente fallito: {score} punti!" }, family: { title: "[ FAMIGLIA ]", nameLabel: "Nome:", avatarLabel: "Umore:", startBtn: "[ MANGIA ]", candidatePrefix: "Figlio: ", questionPrefix: "Dramma #", gameOverTitle: "[ DISEREDATO ]", gameOverMsg: "Senza eredità.", btnLeaderboard: "[ DISEREDATI ]", leaderboardTitle: "[ DISEREDATI ]", btnRestart: "[ RETRY ]", btnShare: "[ SHARE ]", shareText: "Dramma familiare: {score} punti!" } },
-    es: { interview: { title: "[ ENTREVISTA ]", nameLabel: "Nombre:", avatarLabel: "Avatar:", startBtn: "[ ENTRAR ]", candidatePrefix: "Candidato: ", questionPrefix: "Q #", gameOverTitle: "[ DESPEDIDO ]", gameOverMsg: "Seguridad en camino.", btnLeaderboard: "[ VERGÜENZA ]", leaderboardTitle: "[ MURO DE VERGÜENZA ]", btnRestart: "[ REINTENTAR ]", btnShare: "[ COMPARTIR ]", shareText: "¡Despedido con {score} puntos!" }, redflag: { title: "[ CITA ]", nameLabel: "Nombre:", avatarLabel: "Máscara:", startBtn: "[ SENTARSE ]", candidatePrefix: "Cita: ", questionPrefix: "Crisis #", gameOverTitle: "[ RECHAZADO ]", gameOverMsg: "Desastre total.", btnLeaderboard: "[ RECHAZADOS ]", leaderboardTitle: "[ PEORES RED FLAGS ]", btnRestart: "[ NUEVO ]", btnShare: "[ COMPARTIR ]", shareText: "¡Cita arruinada con {score} puntos!" }, timetravel: { title: "[ TIEMPO ]", nameLabel: "Viajero:", avatarLabel: "Estilo:", startBtn: "[ GO ]", candidatePrefix: "Viajero: ", questionPrefix: "Event #", gameOverTitle: "[ PARADOJA ]", gameOverMsg: "Borrado.", btnLeaderboard: "[ DESTRUCTORES ]", leaderboardTitle: "[ DESTRUCTORES ]", btnRestart: "[ RETRY ]", btnShare: "[ SHARE ]", shareText: "Paradoja: {score} puntos!" }, influencer: { title: "[ LIVE ]", nameLabel: "Canal:", avatarLabel: "Filtro:", startBtn: "[ GO LIVE ]", candidatePrefix: "Creador: ", questionPrefix: "Escándalo #", gameOverTitle: "[ CANCELADO ]", gameOverMsg: "Terminado.", btnLeaderboard: "[ CANCELADOS ]", leaderboardTitle: "[ CANCELADOS ]", btnRestart: "[ NEW ]", btnShare: "[ SHARE ]", shareText: "Cancelado con {score} puntos!" }, agent: { title: "[ SECRETO ]", nameLabel: "Código:", avatarLabel: "Agente:", startBtn: "[ GO ]", candidatePrefix: "Agente: ", questionPrefix: "Error #", gameOverTitle: "[ FALLIDO ]", gameOverMsg: "Crisis.", btnLeaderboard: "[ EXPUESTOS ]", leaderboardTitle: "[ EXPUESTOS ]", btnRestart: "[ RETRY ]", btnShare: "[ SHARE ]", shareText: "Agente fallido: {score} puntos!" }, family: { title: "[ FAMILIA ]", nameLabel: "Nombre:", avatarLabel: "Humor:", startBtn: "[ COMER ]", candidatePrefix: "Hijo: ", questionPrefix: "Drama #", gameOverTitle: "[ DESHEREDADO ]", gameOverMsg: "Sin herencia.", btnLeaderboard: "[ DESHEREDADOS ]", leaderboardTitle: "[ DESHEREDADOS ]", btnRestart: "[ RETRY ]", btnShare: "[ SHARE ]", shareText: "Drama familiar: {score} puntos!" } }
-};
-
-const avatars = {
-    interview: ["Felix", "Aneka", "Jude", "Aiden", "Chase", "Destiny", "James", "Leah", "Oliver", "Sadie"].map(s => `https://api.dicebear.com/9.x/adventurer/svg?seed=${s}`),
-    redflag: ["Dayi&top=noHair&facialHair=moustacheMagnum", "Macho&top=shortHairShortFlat&accessories=sunglasses", "Zibidi&top=shortHairShaggyMullet&mouth=sad", "Weirdo&mouth=vomit", "Punk&hairColor=Pink", "Goth&hairColor=Black", "Art&hairColor=Purple", "Snob&accessories=sunglasses", "Asi&hairColor=Blue", "Keko&mouth=grimace"].map(s => `https://api.dicebear.com/9.x/avataaars/svg?seed=${s}`),
-    timetravel: ["Doc", "Marty", "Tardis", "Cyber", "Neo", "Trinity", "Viking", "Pharaoh", "Cowboy", "Einstein"].map(s => `https://api.dicebear.com/9.x/pixel-art/svg?seed=${s}`),
-    influencer: ["Star&accessories=sunglasses", "Fame&mouth=smile", "Trendy&hairColor=Blonde", "Viral&top=longHairCurvy", "Gamer&accessories=kurt", "Vlogger&hairColor=Pink", "Model&mouth=twinkle", "Hype&top=shortHairShortFlat", "Clout&facialHair=beardLight", "Streamer&eyes=wink"].map(s => `https://api.dicebear.com/9.x/avataaars/svg?seed=${s}`),
-    agent: ["Bond", "Bourne", "Hunt", "Spy", "Secret", "Sniper", "Intel", "Ghost", "Shadow", "Phantom"].map(s => `https://api.dicebear.com/9.x/avataaars/svg?seed=${s}&accessories=sunglasses&clothing=blazerAndShirt`),
-    family: ["Grandpa&top=noHair", "Grandma&top=longHairBun", "Aunt&top=longHairCurly", "Uncle&facialHair=moustacheMagnum", "Cousin&mouth=smirk", "Nephew&top=shortHairShortFlat", "Niece&hairColor=Blonde", "Dad&facialHair=beardMedium", "Mom&top=longHairStraight", "InLaw&eyes=squint"].map(s => `https://api.dicebear.com/9.x/avataaars/svg?seed=${s}`)
+    es: { interview: { title: "[ ENTREVISTA ]", nameLabel: "Nombre:", avatarLabel: "Avatar:", startBtn: "[ ENTRAR ]", candidatePrefix: "Candidato: ", questionPrefix: "Q #", gameOverTitle: "[ DESPEDIDO ]", gameOverMsg: "Seguridad en camino.", btnLeaderboard: "[ VERGÜENZA ]", leaderboardTitle: "[ MURO DE VERGÜENZA ]", btnRestart: "[ REINTENTAR ]", btnShare: "[ COMPARTIR ]", shareText: "¡Despedido con {score} puntos!" }, redflag: { title: "[ CITA ]", nameLabel: "Nombre:", avatarLabel: "Máscara:", startBtn: "[ SENTARSE ]", candidatePrefix: "Cita: ", questionPrefix: "Crisis #", gameOverTitle: "[ RECHAZADO ]", gameOverMsg: "Desastre total.", btnLeaderboard: "[ RECHAZADOS ]", leaderboardTitle: "[ PEORES RED FLAGS ]", btnRestart: "[ NUEVO ]", btnShare: "[ COMPARTIR ]", shareText: "¡Cita arruinada con {score} puntos!" }, timetravel: { title: "[ TIEMPO ]", nameLabel: "Viajero:", avatarLabel: "Estilo:", startBtn: "[ GO ]", candidatePrefix: "Viajero: ", questionPrefix: "Event #", gameOverTitle: "[ PARADOJA ]", gameOverMsg: "Borrado.", btnLeaderboard: "[ DESTRUCTORES ]", leaderboardTitle: "[ DESTRUCTORES ]", btnRestart: "[ RETRY ]", btnShare: "[ SHARE ]", shareText: "Paradoja: {score} puntos!" }, influencer: { title: "[ LIVE ]", nameLabel: "Canal:", avatarLabel: "Filtro:", startBtn: "[ GO LIVE ]", candidatePrefix: "Creador: ", questionPrefix: "Escándalo #", gameOverTitle: "[ CANCELADO ]", gameOverMsg: "Terminado.", btnLeaderboard: "[ CANCELADOS ]", leaderboardTitle: "[ CANCELADOS ]", btnRestart: "[ NEW ]", btnShare: "[ SHARE ]", shareText: "Cancelado con {score} puntos!" }, agent: { title: "[ SECRETO ]", nameLabel: "Código:", avatarLabel: "Agente:", startBtn: "[ GO ]", candidatePrefix: "Agente: ", questionPrefix: "Error #", gameOverTitle: "[ FALLIDO ]", gameOverMsg: "Crisis.", btnLeaderboard: "[ EXPUESTOS ]", leaderboardTitle: "[ EXPUESTOS ]", btnRestart: "[ RETRY ]", btnShare: "[ SHARE ]", shareText: "Agente fallito: {score} puntos!" }, family: { title: "[ FAMILIA ]", nameLabel: "Nombre:", avatarLabel: "Humor:", startBtn: "[ COMER ]", candidatePrefix: "Hijo: ", questionPrefix: "Drama #", gameOverTitle: "[ DESHEREDADO ]", gameOverMsg: "Sin herencia.", btnLeaderboard: "[ DESHEREDADOS ]", leaderboardTitle: "[ DESHEREDADOS ]", btnRestart: "[ RETRY ]", btnShare: "[ SHARE ]", shareText: "Drama familiar: {score} puntos!" } }
 };
 
 let secilenAvatar = null;
@@ -102,6 +97,8 @@ function renderAvatars() {
     const grid = document.getElementById('avatarGrid');
     grid.innerHTML = "";
     secilenAvatar = null; 
+    
+    // avatars objesi artık avatars.js dosyasından geliyor!
     avatars[currentMode].forEach(url => {
         let div = document.createElement('div');
         div.className = 'avatar-option';
@@ -175,7 +172,7 @@ window.startGame = async function() {
         });
 
         if(fetchedQuestions.length === 0) {
-            alert("Bu evren için henüz soru bulunamadı!");
+            alert("Bu evren için henüz soru bulunamadı! Lütfen soruları yükleyin.");
             startBtn.disabled = false; updateUI(); return;
         }
 
@@ -282,4 +279,8 @@ window.shareScore = function() {
     else { window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(textToShare)}&url=${encodeURIComponent(urlToShare)}`, '_blank'); }
 }
 
-document.addEventListener('DOMContentLoaded', () => { renderAvatars(); updateUI(); });
+// Oyun Başlatıcı
+document.addEventListener('DOMContentLoaded', () => { 
+    renderAvatars(); 
+    updateUI(); 
+});
